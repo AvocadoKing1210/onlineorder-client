@@ -84,9 +84,9 @@ export default function Footer({ restaurantName, tagline, email, socialLinks }: 
         
         <div className="text-center space-y-2">
           {config.footer.engagementDates && (
-            <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
               Limited engagement · {config.footer.engagementDates}
-            </p>
+          </p>
           )}
           <p className="text-xs text-muted-foreground">
             © {config.footer.copyrightYear} {restaurantName}. All rights reserved.

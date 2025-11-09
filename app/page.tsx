@@ -10,7 +10,7 @@ import DetailsSection from "@/components/DetailsSection";
 import PrintableMenu from "@/components/PrintableMenu";
 import ReservationCTA from "@/components/ReservationCTA";
 import Footer from "@/components/Footer";
-import { config, resolveImagePath, getFullAddress } from "@/lib/config";
+import { config, resolveImagePath, resolveVideoPath, getFullAddress } from "@/lib/config";
 
 export default function Home() {
   // Map dishes with images
@@ -222,7 +222,8 @@ export default function Home() {
           tagline={config.hero.tagline}
           dates={config.hero.dates}
           location={config.hero.location}
-          backgroundImage={resolveImagePath(config.hero.backgroundImage)}
+          backgroundImage={config.hero.backgroundImage ? resolveImagePath(config.hero.backgroundImage) : undefined}
+          backgroundVideo={config.hero.backgroundVideo ? resolveVideoPath(config.hero.backgroundVideo) : undefined}
           ctaText={config.hero.ctaText}
         />
       </div>

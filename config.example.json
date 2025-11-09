@@ -69,6 +69,7 @@
     "dates": "Open Daily",
     "location": "Your Location",
     "backgroundImage": "@assets/stock_images/hero-image.jpg",
+    "backgroundVideo": "@assets/video/hero-video.mp4",
     "ctaText": "Explore"
   },
   "concept": {

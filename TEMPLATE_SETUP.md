@@ -96,10 +96,17 @@ Customize the navigation menu:
     "dates": "Open Daily",
     "location": "Your Location",
     "backgroundImage": "@assets/stock_images/your-hero-image.jpg",
+    "backgroundVideo": "@assets/video/your-hero-video.mp4",
     "ctaText": "Explore"
   }
 }
 ```
+
+**Note**: 
+- You can use either `backgroundImage` or `backgroundVideo`, or both
+- If both are provided, video will be used and image will be a fallback
+- Video should be in MP4 format for best browser compatibility
+- Recommended video specs: 1920x1080, 25-30fps, H.264 codec
 
 ### 5. Menu (`menu`, `printableMenu`)
 
@@ -156,7 +163,7 @@ Add your menu items:
 }
 ```
 
-## Image Management
+## Asset Management
 
 ### Adding Images
 
@@ -167,9 +174,20 @@ Add your menu items:
    ```
 3. The template automatically resolves these paths to `/assets/stock_images/your-image.jpg`
 
-### Image Path Resolution
+### Adding Videos
 
-The `resolveImagePath()` function in `app/lib/config.ts` handles image path resolution. To add new image mappings, update the `imageMap` object in that file.
+1. Place your videos in `public/assets/video/`
+2. Reference them in config using the `@assets/video/` prefix:
+   ```json
+   "backgroundVideo": "@assets/video/your-video.mp4"
+   ```
+3. Recommended video format: MP4 (H.264 codec)
+4. Recommended specs: 1920x1080, 25-30fps
+5. The template automatically resolves these paths to `/assets/video/your-video.mp4`
+
+### Path Resolution
+
+The `resolveImagePath()` and `resolveVideoPath()` functions in `app/lib/config.ts` handle asset path resolution. To add new asset mappings, update the `imageMap` or `videoMap` objects in that file. Paths starting with `@assets/` are automatically resolved even if not in the map.
 
 ## Type Safety
 

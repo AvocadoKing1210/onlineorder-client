@@ -61,7 +61,8 @@ export interface RestaurantConfig {
     tagline: string;
     dates: string;
     location: string;
-    backgroundImage: string;
+    backgroundImage?: string;
+    backgroundVideo?: string;
     ctaText: string;
   };
   concept: {
@@ -132,6 +133,12 @@ const imageMap: Record<string, string> = {
   '@assets/stock_images/restaurant_ambiance__973c1831.jpg': '/assets/stock_images/restaurant_ambiance__973c1831.jpg',
 };
 
+// Helper function to resolve video paths
+// Maps config video paths (using @assets prefix) to public asset paths
+const videoMap: Record<string, string> = {
+  '@assets/video/3768941-hd_1920_1080_25fps.mp4': '/assets/video/3768941-hd_1920_1080_25fps.mp4',
+};
+
 /**
  * Resolves image paths from config format to public asset paths
  * 
@@ -158,6 +165,34 @@ export function resolveImagePath(imagePath: string): string {
   
   // Otherwise return as-is (for external URLs or direct paths)
   return imagePath;
+}
+
+/**
+ * Resolves video paths from config format to public asset paths
+ * 
+ * If the video path starts with "@assets/", it looks up the mapped path.
+ * Otherwise, returns the path as-is (useful for external URLs or direct paths).
+ * 
+ * @param videoPath - Video path from config (e.g., "@assets/video/video.mp4")
+ * @returns Resolved public path (e.g., "/assets/video/video.mp4")
+ * 
+ * @example
+ * resolveVideoPath("@assets/video/hero.mp4") // "/assets/video/hero.mp4"
+ * resolveVideoPath("https://example.com/video.mp4") // "https://example.com/video.mp4"
+ */
+export function resolveVideoPath(videoPath: string): string {
+  // If path is in the map, use the mapped value
+  if (videoMap[videoPath]) {
+    return videoMap[videoPath];
+  }
+  
+  // If path starts with @assets but not in map, auto-resolve it
+  if (videoPath.startsWith('@assets/')) {
+    return videoPath.replace('@assets/', '/');
+  }
+  
+  // Otherwise return as-is (for external URLs or direct paths)
+  return videoPath;
 }
 
 /**

@@ -55,14 +55,14 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-12">
           {config.navigation.menuItems.map((item) => (
-            <button
+          <button
               key={item.sectionId}
               onClick={() => scrollToSection(item.sectionId)}
-              className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-colors"
+            className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-colors"
               data-testid={`nav-${item.sectionId}`}
-            >
+          >
               {item.label}
-            </button>
+          </button>
           ))}
         </div>
 
@@ -97,14 +97,14 @@ export default function Navbar() {
       >
         <div className="flex flex-col px-6 py-4 gap-4">
           {config.navigation.menuItems.map((item) => (
-            <button
+          <button
               key={item.sectionId}
               onClick={() => scrollToSection(item.sectionId)}
-              className="text-left text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-all duration-200 py-2 transform hover:translate-x-2"
+            className="text-left text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-all duration-200 py-2 transform hover:translate-x-2"
               data-testid={`nav-${item.sectionId}-mobile`}
-            >
+          >
               {item.label}
-            </button>
+          </button>
           ))}
         </div>
       </div>
