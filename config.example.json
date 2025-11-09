@@ -1,0 +1,160 @@
+{
+  "restaurant": {
+    "name": "Your Restaurant Name",
+    "tagline": "Your restaurant tagline",
+    "email": "hello@yourrestaurant.com",
+    "reservationEmail": "reservations@yourrestaurant.com",
+    "phone": "+1-555-123-4567",
+    "socialLinks": {
+      "instagram": "https://instagram.com/yourrestaurant",
+      "facebook": "https://facebook.com/yourrestaurant",
+      "twitter": "",
+      "tiktok": "",
+      "youtube": ""
+    }
+  },
+  "site": {
+    "url": "https://yourrestaurant.com",
+    "canonical": "https://yourrestaurant.com",
+    "language": "en",
+    "locale": "en_US"
+  },
+  "seo": {
+    "title": "Your Restaurant Name - Your Tagline",
+    "description": "Your restaurant's SEO description. This appears in search results and social media shares.",
+    "keywords": ["restaurant", "dining", "your city", "cuisine type"],
+    "author": "Your Restaurant Name",
+    "geo": {
+      "region": "US",
+      "placename": "Your City",
+      "latitude": "40.7589",
+      "longitude": "-73.9851"
+    },
+    "openGraph": {
+      "title": "Your Restaurant Name - Your Tagline",
+      "description": "Your restaurant's description for social media sharing.",
+      "type": "website",
+      "siteName": "Your Restaurant Name"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Your Restaurant Name - Your Tagline",
+      "description": "Your restaurant's description for Twitter sharing."
+    },
+    "structuredData": {
+      "cuisine": "Your Cuisine Type",
+      "priceRange": "$$"
+    }
+  },
+  "navigation": {
+    "logo": "Your Restaurant",
+    "menuItems": [
+      {
+        "label": "Menu",
+        "sectionId": "menu"
+      },
+      {
+        "label": "About",
+        "sectionId": "about"
+      },
+      {
+        "label": "Order",
+        "sectionId": "order"
+      }
+    ]
+  },
+  "hero": {
+    "title": "Your Restaurant Name",
+    "tagline": "Your compelling hero tagline",
+    "dates": "Open Daily",
+    "location": "Your Location",
+    "backgroundImage": "@assets/stock_images/hero-image.jpg",
+    "ctaText": "Explore"
+  },
+  "concept": {
+    "statement": "Your restaurant's concept statement. This should describe your unique dining experience, philosophy, and what makes you special."
+  },
+  "menu": {
+    "title": "Signature Dishes",
+    "dishes": [
+      {
+        "name": "Signature Dish 1",
+        "description": "A detailed description of your signature dish, highlighting key ingredients and preparation methods.",
+        "price": "$25",
+        "image": "@assets/stock_images/dish-1.jpg"
+      },
+      {
+        "name": "Signature Dish 2",
+        "description": "Another delicious dish description.",
+        "price": "$30",
+        "image": "@assets/stock_images/dish-2.jpg"
+      }
+    ]
+  },
+  "printableMenu": {
+    "title": "Take-Home Menu",
+    "subtitle": "Save or print our curated selection for your records",
+    "items": [
+      {
+        "name": "Signature Dish 1",
+        "description": "Brief description for printable menu",
+        "price": "$25",
+        "image": "@assets/stock_images/dish-1.jpg"
+      }
+    ]
+  },
+  "details": {
+    "title": "Visit Details",
+    "schedule": {
+      "days": [
+        {
+          "day": "Monday",
+          "hours": "11:00 a.m. – 9:00 p.m."
+        },
+        {
+          "day": "Tuesday",
+          "hours": "11:00 a.m. – 9:00 p.m."
+        },
+        {
+          "day": "Wednesday",
+          "hours": "11:00 a.m. – 9:00 p.m."
+        },
+        {
+          "day": "Thursday",
+          "hours": "11:00 a.m. – 9:00 p.m."
+        },
+        {
+          "day": "Friday",
+          "hours": "11:00 a.m. – 10:00 p.m."
+        },
+        {
+          "day": "Saturday",
+          "hours": "11:00 a.m. – 10:00 p.m."
+        },
+        {
+          "day": "Sunday",
+          "hours": "11:00 a.m. – 9:00 p.m."
+        }
+      ]
+    },
+    "location": {
+      "address": "123 Main Street, Suite 100",
+      "city": "Your City",
+      "state": "ST",
+      "country": "US",
+      "googleMapsLink": "https://www.google.com/maps/search/?api=1&query=Your+Restaurant+Address",
+      "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133194902!2d-73.98811768459398!3d40.75889597932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ1JzMyLjAiTiA3M8KwNTknMTkuMiJX!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+    }
+  },
+  "reservation": {
+    "title": "Reserve Your Table",
+    "description": "Book your dining experience with us. We look forward to serving you.",
+    "ctaText": "Reserve Now",
+    "backgroundImage": "@assets/stock_images/reservation-bg.jpg"
+  },
+  "footer": {
+    "engagementDates": "Open Year Round",
+    "copyrightYear": "2025"
+  }
+}
+

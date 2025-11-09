@@ -1,0 +1,202 @@
+{
+  "restaurant": {
+    "name": "Éphémère",
+    "tagline": "A limited culinary experience",
+    "email": "hello@ephemere.com",
+    "reservationEmail": "reservations@ephemere.com",
+    "phone": "",
+    "socialLinks": {
+      "instagram": "https://instagram.com/ephemere",
+      "facebook": "https://facebook.com/ephemere",
+      "twitter": "",
+      "tiktok": "",
+      "youtube": ""
+    }
+  },
+  "site": {
+    "url": "https://ephemere.com",
+    "canonical": "https://ephemere.com",
+    "language": "en",
+    "locale": "en_US"
+  },
+  "seo": {
+    "title": "Éphémère - A Limited Culinary Experience",
+    "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting. Limited engagement only. Located in the Historic Warehouse District.",
+    "keywords": ["restaurant", "fine dining", "pop-up restaurant", "culinary experience", "Éphémère", "reservations", "Historic Warehouse District", "fine dining restaurant"],
+    "author": "Éphémère",
+    "geo": {
+      "region": "US",
+      "placename": "Historic Warehouse District",
+      "latitude": "40.7589",
+      "longitude": "-73.9851"
+    },
+    "openGraph": {
+      "title": "Éphémère - A Limited Culinary Experience",
+      "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting.",
+      "type": "website",
+      "siteName": "Éphémère"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Éphémère - A Limited Culinary Experience",
+      "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting."
+    },
+    "structuredData": {
+      "cuisine": "Fine Dining",
+      "priceRange": "$$$"
+    }
+  },
+  "navigation": {
+    "logo": "Éphémère",
+    "menuItems": [
+      {
+        "label": "Menu",
+        "sectionId": "menu"
+      },
+      {
+        "label": "About",
+        "sectionId": "about"
+      },
+      {
+        "label": "Order",
+        "sectionId": "order"
+      }
+    ]
+  },
+  "hero": {
+    "title": "Éphémère",
+    "tagline": "An intimate culinary journey through seasonal flavors",
+    "dates": "December 15–31, 2025",
+    "location": "The Historic Warehouse District",
+    "backgroundImage": "@assets/stock_images/elegant_restaurant_i_85ea31a6.jpg",
+    "ctaText": "Explore"
+  },
+  "concept": {
+    "statement": "For three weeks only, we invite you to experience a dining event where innovation meets tradition. Each dish tells a story of local ingredients, artisanal craftsmanship, and culinary passion."
+  },
+  "menu": {
+    "title": "Signature Dishes",
+    "dishes": [
+      {
+        "name": "Roasted Monkfish",
+        "description": "Pan-seared monkfish with saffron beurre blanc, heirloom tomatoes, and micro herbs",
+        "price": "$42",
+        "image": "@assets/stock_images/fine_dining_plating__d1e489c1.jpg"
+      },
+      {
+        "name": "Heritage Pork Tenderloin",
+        "description": "Sous-vide pork with apple mostarda, crispy pancetta, and wild mushroom reduction",
+        "price": "$38",
+        "image": "@assets/stock_images/fine_dining_plating__bbc0a5dc.jpg"
+      },
+      {
+        "name": "Seasonal Tasting",
+        "description": "Chef's selection of three seasonal preparations highlighting local ingredients",
+        "price": "$58",
+        "image": "@assets/stock_images/fine_dining_plating__21ea3959.jpg"
+      },
+      {
+        "name": "Duck Confit",
+        "description": "Slow-cooked duck leg with cherry gastrique, roasted root vegetables, and thyme",
+        "price": "$45",
+        "image": "@assets/stock_images/fine_dining_plating__48222664.jpg"
+      },
+      {
+        "name": "Lobster Risotto",
+        "description": "Creamy arborio rice with butter-poached lobster, pea tendrils, and lemon zest",
+        "price": "$52",
+        "image": "@assets/stock_images/fine_dining_plating__7d06f067.jpg"
+      },
+      {
+        "name": "Wagyu Beef",
+        "description": "Grilled A5 wagyu with truffle pommes purée, asparagus, and red wine jus",
+        "price": "$68",
+        "image": "@assets/stock_images/fine_dining_plating__a76cbce9.jpg"
+      }
+    ]
+  },
+  "printableMenu": {
+    "title": "Take-Home Menu",
+    "subtitle": "Save or print our curated selection for your records",
+    "items": [
+      {
+        "name": "Roasted Monkfish",
+        "description": "Pan-seared with saffron beurre blanc, heirloom tomatoes",
+        "price": "$42",
+        "image": "@assets/stock_images/fine_dining_plating__d1e489c1.jpg"
+      },
+      {
+        "name": "Heritage Pork Tenderloin",
+        "description": "Sous-vide pork with apple mostarda, wild mushroom",
+        "price": "$38",
+        "image": "@assets/stock_images/fine_dining_plating__bbc0a5dc.jpg"
+      },
+      {
+        "name": "Seasonal Tasting",
+        "description": "Chef's selection of three seasonal preparations",
+        "price": "$58",
+        "image": "@assets/stock_images/fine_dining_plating__21ea3959.jpg"
+      },
+      {
+        "name": "Duck Confit",
+        "description": "Slow-cooked with cherry gastrique, roasted vegetables",
+        "price": "$45",
+        "image": "@assets/stock_images/fine_dining_plating__48222664.jpg"
+      }
+    ]
+  },
+  "details": {
+    "title": "Visit Details",
+    "schedule": {
+      "days": [
+        {
+          "day": "Saturday",
+          "hours": "11:30 a.m. – 9:00 p.m."
+        },
+        {
+          "day": "Sunday",
+          "hours": "11:30 a.m. – 8:45 p.m."
+        },
+        {
+          "day": "Monday",
+          "hours": "11:30 a.m. – 8:45 p.m."
+        },
+        {
+          "day": "Tuesday",
+          "hours": "11:30 a.m. – 8:45 p.m."
+        },
+        {
+          "day": "Wednesday",
+          "hours": "11:30 a.m. – 8:45 p.m."
+        },
+        {
+          "day": "Thursday",
+          "hours": "11:30 a.m. – 8:45 p.m."
+        },
+        {
+          "day": "Friday",
+          "hours": "11:30 a.m. – 9:00 p.m."
+        }
+      ]
+    },
+    "location": {
+      "address": "1847 Warehouse Lane, Historic District, Suite 200",
+      "city": "Historic District",
+      "state": "",
+      "country": "US",
+      "googleMapsLink": "https://www.google.com/maps/search/?api=1&query=1847+Warehouse+Lane+Historic+District+Suite+200",
+      "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133194902!2d-73.98811768459398!3d40.75889597932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ1JzMyLjAiTiA3M8KwNTknMTkuMiJX!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+    }
+  },
+  "reservation": {
+    "title": "Reserve Your Experience",
+    "description": "Seating is extremely limited for this exclusive engagement. Secure your table today and join us for an unforgettable evening.",
+    "ctaText": "Reserve Now",
+    "backgroundImage": "@assets/stock_images/restaurant_ambiance__973c1831.jpg"
+  },
+  "footer": {
+    "engagementDates": "December 15–31, 2025",
+    "copyrightYear": "2025"
+  }
+}
+
