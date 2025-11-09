@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { config } from "@/lib/config";
 
 export default function Navbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -22,11 +24,19 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavigation = (sectionId: string) => {
+    if (sectionId === 'order') {
+      router.push('/order');
+    } else {
+      scrollToSection(sectionId);
+    }
+    setIsMobileMenuOpen(false); // Close mobile menu after clicking
+  };
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false); // Close mobile menu after clicking
     }
   };
 
@@ -57,7 +67,7 @@ export default function Navbar() {
           {config.navigation.menuItems.map((item) => (
           <button
               key={item.sectionId}
-              onClick={() => scrollToSection(item.sectionId)}
+              onClick={() => handleNavigation(item.sectionId)}
             className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-colors"
               data-testid={`nav-${item.sectionId}`}
           >
@@ -99,7 +109,7 @@ export default function Navbar() {
           {config.navigation.menuItems.map((item) => (
           <button
               key={item.sectionId}
-              onClick={() => scrollToSection(item.sectionId)}
+              onClick={() => handleNavigation(item.sectionId)}
             className="text-left text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-all duration-200 py-2 transform hover:translate-x-2"
               data-testid={`nav-${item.sectionId}-mobile`}
           >
