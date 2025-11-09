@@ -66,12 +66,12 @@ export default function HeroSection({
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-20" />
         </div>
       ) : backgroundImage ? (
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-20" />
-        </div>
+      </div>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-20" />
       )}
@@ -107,23 +107,23 @@ export default function HeroSection({
         </div>
         
         <div className="flex justify-center">
-          <Button 
-            size="lg"
+        <Button 
+          size="lg"
             className="px-6 py-3 text-base tracking-widest uppercase backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/30 text-white rounded-full cursor-pointer transition-all duration-200 hover:scale-105 flex items-center gap-3"
-            data-testid="button-hero-cta"
+          data-testid="button-hero-cta"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const element = document.getElementById('concept');
+            const element = document.getElementById('concept');
               if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
               }
-            }}
+          }}
             type="button"
-          >
+        >
             <span>{ctaText}</span>
             <ArrowRight className="w-4 h-4" />
-          </Button>
+        </Button>
         </div>
       </div>
     </section>

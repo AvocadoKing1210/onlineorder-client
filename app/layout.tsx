@@ -22,6 +22,12 @@ export const metadata: Metadata = {
   description: config.seo.description,
   keywords: config.seo.keywords,
   authors: [{ name: config.seo.author }],
+  icons: {
+    icon: [
+      { url: "/assets/icons/file.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    shortcut: [{ url: "/assets/icons/file.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: config.seo.openGraph.title,
     description: config.seo.openGraph.description,
@@ -63,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang={config.site.language} className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" type="image/svg+xml" sizes="any" href="/assets/icons/file.svg" />
       </head>
       <body className="font-sans antialiased">
         <QueryProvider>
