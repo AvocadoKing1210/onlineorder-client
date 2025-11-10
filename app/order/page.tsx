@@ -452,7 +452,7 @@ export default function OrderPage() {
               </div>
                 <div className="flex flex-col gap-2">
                 <Button
-                   className="w-full no-default-hover-elevate no-default-active-elevate"
+                   className="w-full no-default-hover-elevate no-default-active-elevate bg-foreground text-background hover:bg-foreground/90 border-transparent"
                   size="lg"
                   onClick={() => {
                     // TODO: Implement checkout

@@ -82,7 +82,7 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                   {cartItemCount > 0 && (
                     <Badge
                       variant="default"
-                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate"
+                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate bg-foreground text-background border-transparent"
                     >
                       {cartItemCount}
                     </Badge>
@@ -140,7 +140,7 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                   {cartItemCount > 0 && (
                     <Badge
                       variant="default"
-                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate"
+                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate bg-foreground text-background border-transparent"
                     >
                       {cartItemCount}
                     </Badge>
