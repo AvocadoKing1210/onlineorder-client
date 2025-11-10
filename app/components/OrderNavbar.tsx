@@ -75,17 +75,19 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 variant="ghost"
                 size="icon"
                 onClick={onCartClick}
-                className={`h-9 w-9 ${cartItemCount > 0 ? 'relative' : ''}`}
+                className="h-9 w-9 no-default-hover-elevate no-default-active-elevate"
               >
-                <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="default"
-                    className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
+                <div className="relative h-full w-full flex items-center justify-center">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemCount > 0 && (
+                    <Badge
+                      variant="default"
+                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate"
+                    >
+                      {cartItemCount}
+                    </Badge>
+                  )}
+                </div>
               </Button>
             )}
             
@@ -131,17 +133,19 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 variant="ghost"
                 size="icon"
                 onClick={onCartClick}
-                className={`h-9 w-9 ${cartItemCount > 0 ? 'relative' : ''}`}
+                className="h-9 w-9 no-default-hover-elevate no-default-active-elevate"
               >
-                <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
-                  <Badge
-                    variant="default"
-                    className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
+                <div className="relative h-full w-full flex items-center justify-center">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemCount > 0 && (
+                    <Badge
+                      variant="default"
+                      className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs no-default-hover-elevate no-default-active-elevate"
+                    >
+                      {cartItemCount}
+                    </Badge>
+                  )}
+                </div>
               </Button>
             )}
             

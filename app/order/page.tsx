@@ -387,29 +387,23 @@ export default function OrderPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0"
+                              className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 no-default-hover-elevate no-default-active-elevate"
                                 onClick={() => removeFromCart(item.id)}
                             >
                               <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
-                            {item.menu_item_description && (
-                              <p className="text-xs sm:text-sm text-muted-foreground mb-2 line-clamp-1">
-                                {item.menu_item_description}
-                          </p>
-                            )}
+                            {/* Remove description in cart */}
                             {/* Modifiers */}
                             {item.modifiers.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {item.modifiers.map((modifier, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    variant="outline"
-                                    className="text-xs px-1.5 py-0 rounded-full"
-                                  >
-                                    {modifier.modifier_group_name}: {modifier.modifier_option_name}
-                                  </Badge>
-                                ))}
+                              <div className="mb-2 text-xs text-muted-foreground">
+                                <div className="border-l border-border space-y-1">
+                                  {item.modifiers.map((modifier, idx) => (
+                                    <div key={`${modifier.modifier_option_id}-${idx}`} className="pl-3">
+                                      {modifier.modifier_option_name}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           <div className="flex items-center justify-between gap-2">
@@ -417,7 +411,7 @@ export default function OrderPage() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                className="h-7 w-7 sm:h-8 sm:w-8 no-default-hover-elevate no-default-active-elevate"
                                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               >
                                 <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -428,7 +422,7 @@ export default function OrderPage() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                className="h-7 w-7 sm:h-8 sm:w-8 no-default-hover-elevate no-default-active-elevate"
                                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               >
                                 <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -458,7 +452,7 @@ export default function OrderPage() {
               </div>
                 <div className="flex flex-col gap-2">
                 <Button
-                  className="w-full"
+                   className="w-full no-default-hover-elevate no-default-active-elevate"
                   size="lg"
                   onClick={() => {
                     // TODO: Implement checkout
@@ -469,7 +463,7 @@ export default function OrderPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full"
+                   className="w-full no-default-hover-elevate no-default-active-elevate"
                   onClick={clearCart}
                 >
                   Clear Cart
