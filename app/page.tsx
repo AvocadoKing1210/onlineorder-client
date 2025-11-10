@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import { clearOrderRouteTracking } from "@/lib/route-tracker";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import HeroSection from "@/components/HeroSection";
 import ConceptStatement from "@/components/ConceptStatement";
@@ -13,6 +15,15 @@ import Footer from "@/components/Footer";
 import { config, resolveImagePath, resolveVideoPath, getFullAddress } from "@/lib/config";
 
 export default function Home() {
+  const pathname = usePathname()
+  
+  // Clear order route tracking when on home page (direct navigation)
+  useEffect(() => {
+    if (pathname === '/') {
+      clearOrderRouteTracking()
+    }
+  }, [pathname])
+
   // Map dishes with images
   const dishes = config.menu.dishes.map(dish => ({
     ...dish,

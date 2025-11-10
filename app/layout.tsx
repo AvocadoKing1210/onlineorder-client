@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/lib/query-provider";
+import { AuthProvider } from "@/lib/auth-provider";
 import { config } from "@/lib/config";
 
 const inter = Inter({
@@ -73,10 +74,12 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <QueryProvider>
+          <AuthProvider>
           <TooltipProvider>
             {children}
             <Toaster />
           </TooltipProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>
