@@ -65,6 +65,43 @@ interface CartItem {
   line_total: number // (unit_price + sum of modifier price_deltas) * quantity
 }
 
+// LocalStorage key for cart persistence
+const CART_STORAGE_KEY = 'order_system_cart'
+
+// Helper functions for localStorage operations
+const loadCartFromStorage = (): CartItem[] => {
+  if (typeof window === 'undefined') return []
+  
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY)
+    if (!stored) return []
+    
+    const parsed = JSON.parse(stored)
+    // Validate that parsed data is an array
+    if (Array.isArray(parsed)) {
+      return parsed
+    }
+    return []
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error)
+    return []
+  }
+}
+
+const saveCartToStorage = (cart: CartItem[]): void => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
+  } catch (error) {
+    console.error('Error saving cart to localStorage:', error)
+    // Handle quota exceeded error gracefully
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, cart not saved')
+    }
+  }
+}
+
 export default function OrderPage() {
   const router = useRouter()
   const pathname = usePathname()
@@ -73,6 +110,24 @@ export default function OrderPage() {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isCartLoaded, setIsCartLoaded] = useState(false)
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = loadCartFromStorage()
+    if (savedCart.length > 0) {
+      setCart(savedCart)
+    }
+    setIsCartLoaded(true)
+  }, [])
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    // Only save after initial load to avoid overwriting with empty cart
+    if (isCartLoaded) {
+      saveCartToStorage(cart)
+    }
+  }, [cart, isCartLoaded])
 
   // Track that user is on order page
   useEffect(() => {
@@ -245,6 +300,14 @@ export default function OrderPage() {
   // Clear cart
   const clearCart = () => {
     setCart([])
+    // Clear from localStorage as well
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CART_STORAGE_KEY)
+      } catch (error) {
+        console.error('Error clearing cart from localStorage:', error)
+      }
+    }
   }
 
   const isLoading = categoriesLoading || itemsLoading
