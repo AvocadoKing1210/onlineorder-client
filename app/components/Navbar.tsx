@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X, User, LogIn } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { config } from "@/lib/config";
-import { useAuth } from "@/lib/auth-provider";
-import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const router = useRouter();
-  const { user, isLoading, isAuthenticated } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -77,42 +74,6 @@ export default function Navbar() {
               {item.label}
           </button>
           ))}
-          
-          {/* Login/Account Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              router.push('/login');
-              setIsMobileMenuOpen(false);
-            }}
-            className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            ) : isAuthenticated && user ? (
-              <>
-                {user.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'Account'}
-                    className="h-6 w-6 rounded-full mr-2"
-                  />
-                ) : (
-                  <User className="h-4 w-4 mr-2" />
-                )}
-                <span className="hidden lg:inline">
-                  {user.name?.split(' ')[0] || 'Account'}
-                </span>
-                <span className="lg:hidden">Account</span>
-              </>
-            ) : (
-              <>
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -155,37 +116,6 @@ export default function Navbar() {
               {item.label}
           </button>
           ))}
-          
-          {/* Mobile Login/Account Button */}
-          <button
-            onClick={() => {
-              router.push('/login');
-              setIsMobileMenuOpen(false);
-            }}
-            className="text-left text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-all duration-200 py-2 transform hover:translate-x-2 flex items-center gap-2"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            ) : isAuthenticated && user ? (
-              <>
-                {user.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'Account'}
-                    className="h-5 w-5 rounded-full"
-                  />
-                ) : (
-                  <User className="h-4 w-4" />
-                )}
-                <span>Account</span>
-              </>
-            ) : (
-              <>
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
     </nav>

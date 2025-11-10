@@ -57,7 +57,7 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
           </div>
           
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {menuItems.map((item) => (
               <button
                 key={item.sectionId}
@@ -69,13 +69,33 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
               </button>
             ))}
             
-            {/* Desktop Account/Auth Button - Only avatar when logged in */}
+            {/* Desktop Cart Button */}
+            {onCartClick && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onCartClick}
+                className={`h-9 w-9 ${cartItemCount > 0 ? 'relative' : ''}`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <Badge
+                    variant="default"
+                    className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
+                  >
+                    {cartItemCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
+            
+            {/* Desktop Account/Auth Button */}
             {isAuthenticated && user ? (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsAuthDialogOpen(true)}
-                className="h-8 w-8 rounded-full hover:bg-muted/50"
+                className="h-9 w-9 rounded-full hover:bg-muted/50"
               >
                 {user.picture ? (
                   <img
@@ -111,13 +131,13 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 variant="ghost"
                 size="icon"
                 onClick={onCartClick}
-                className="relative h-9 w-9"
+                className={`h-9 w-9 ${cartItemCount > 0 ? 'relative' : ''}`}
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
                   <Badge
                     variant="default"
-                    className="absolute -top-1 -right-1 h-5 min-w-5 px-1.5 flex items-center justify-center text-xs"
+                    className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
                   >
                     {cartItemCount}
                   </Badge>
