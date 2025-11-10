@@ -41,8 +41,14 @@ export async function getAuth0Client(): Promise<Auth0Client | null> {
         redirect_uri: typeof window !== 'undefined' 
           ? window.location.origin + '/callback'
           : process.env.NEXT_PUBLIC_AUTH0_CALLBACK_URL || 'http://localhost:3000/callback',
+        // Enable refresh tokens for automatic token renewal
+        audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE, // Optional: if using API audience
       },
       cacheLocation: 'localstorage',
+      // Enable automatic token refresh
+      useRefreshTokens: true,
+      // Refresh tokens before they expire (5 minutes buffer)
+      tokenExpiryBuffer: 300, // 5 minutes in seconds
     })
 
     return auth0Client
@@ -75,10 +81,30 @@ export async function getSupabaseClient() {
       accessToken: async () => {
         if (!auth0) return ''
         try {
-          // Use ID token instead of access token (ID token is a JWT)
+          // Check if user is authenticated first
+          const isAuth = await auth0.isAuthenticated()
+          if (!isAuth) {
+            return ''
+          }
+
+          // Get ID token - Auth0 SDK will automatically refresh if needed
+          // The SDK handles refresh tokens automatically when useRefreshTokens: true
           const claims = await auth0.getIdTokenClaims()
+          
+          if (!claims?.__raw) {
+            // Token might be expired, try to refresh
+            try {
+              await auth0.getTokenSilently()
+              const refreshedClaims = await auth0.getIdTokenClaims()
+              return refreshedClaims?.__raw || ''
+            } catch (refreshError) {
+              console.error('Error refreshing token:', refreshError)
+              return ''
+            }
+          }
+          
           // The __raw property contains the full JWT string
-          return claims?.__raw || ''
+          return claims.__raw
         } catch (error) {
           console.error('Error getting Auth0 ID token:', error)
           return ''

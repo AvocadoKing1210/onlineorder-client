@@ -83,6 +83,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [auth0Client])
 
+  // Periodic token refresh to ensure tokens stay valid
+  // Refresh every 30 minutes to keep tokens fresh (tokens expire in 24 hours)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !auth0Client || !isAuthenticated) return
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        // Silently refresh the token - Auth0 SDK handles this automatically
+        // This ensures tokens are refreshed before expiration
+        await auth0Client!.getTokenSilently()
+        // Optionally refresh user data
+        const userData = await getUser()
+        if (userData) {
+          setUser(userData)
+        }
+      } catch (error) {
+        // If refresh fails, user might need to re-authenticate
+        console.warn('Token refresh failed, user may need to re-login:', error)
+        // Don't clear auth state here - let the next API call handle it
+      }
+    }, 30 * 60 * 1000) // 30 minutes
+
+    return () => {
+      clearInterval(refreshInterval)
+    }
+  }, [auth0Client, isAuthenticated])
+
   return (
     <AuthContext.Provider
       value={{
