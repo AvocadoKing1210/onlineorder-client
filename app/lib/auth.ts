@@ -47,8 +47,6 @@ export async function getAuth0Client(): Promise<Auth0Client | null> {
       cacheLocation: 'localstorage',
       // Enable automatic token refresh
       useRefreshTokens: true,
-      // Refresh tokens before they expire (5 minutes buffer)
-      tokenExpiryBuffer: 300, // 5 minutes in seconds
     })
 
     return auth0Client
@@ -72,46 +70,17 @@ export async function getSupabaseClient() {
     return null
   }
 
-  const auth0 = await getAuth0Client()
-
-  supabaseClient = createClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      accessToken: async () => {
-        if (!auth0) return ''
-        try {
-          // Check if user is authenticated first
-          const isAuth = await auth0.isAuthenticated()
-          if (!isAuth) {
-            return ''
-          }
-
-          // Get ID token - Auth0 SDK will automatically refresh if needed
-          // The SDK handles refresh tokens automatically when useRefreshTokens: true
-          const claims = await auth0.getIdTokenClaims()
-          
-          if (!claims?.__raw) {
-            // Token might be expired, try to refresh
-            try {
-              await auth0.getTokenSilently()
-              const refreshedClaims = await auth0.getIdTokenClaims()
-              return refreshedClaims?.__raw || ''
-            } catch (refreshError) {
-              console.error('Error refreshing token:', refreshError)
-              return ''
-            }
-          }
-          
-          // The __raw property contains the full JWT string
-          return claims.__raw
-        } catch (error) {
-          console.error('Error getting Auth0 ID token:', error)
-          return ''
-        }
-      },
-    }
-  )
+  // Create Supabase client
+  // For anonymous users (guests), the client will work without a token
+  // RLS policies allow anonymous access to menu data
+  // Note: This client works for both authenticated and anonymous users
+  // Anonymous users will use the 'anon' role automatically
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
 
   return supabaseClient
 }
