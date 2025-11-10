@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface HeroSectionProps {
   title: string;
@@ -24,6 +24,7 @@ export default function HeroSection({
   ctaText = "Explore" 
 }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Ensure video plays and loops
@@ -107,23 +108,36 @@ export default function HeroSection({
         </div>
         
         <div className="flex justify-center">
-        <Button 
-          size="lg"
-            className="px-6 py-3 text-base tracking-widest uppercase backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/30 text-white rounded-full cursor-pointer transition-all duration-200 hover:scale-105 flex items-center gap-3"
-          data-testid="button-hero-cta"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            const element = document.getElementById('concept');
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-              }
-          }}
-            type="button"
-        >
-            <span>{ctaText}</span>
-            <ArrowRight className="w-4 h-4" />
-        </Button>
+          <div className="flex items-center backdrop-blur-md bg-white/10 border border-white/30 rounded-full overflow-hidden">
+            <button
+              className="px-8 py-3 text-base tracking-widest uppercase text-white hover:bg-white/20 transition-all duration-200 cursor-pointer flex-1 text-center min-w-[120px]"
+              data-testid="button-hero-cta"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const element = document.getElementById('concept');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              type="button"
+            >
+              {ctaText}
+            </button>
+            <div className="w-px h-6 bg-white/30 flex-shrink-0" />
+            <button
+              className="px-8 py-3 text-base tracking-widest uppercase text-white hover:bg-white/20 transition-all duration-200 cursor-pointer flex-1 text-center min-w-[120px]"
+              data-testid="button-hero-order"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push('/order');
+              }}
+              type="button"
+            >
+              Order
+            </button>
+          </div>
         </div>
       </div>
     </section>

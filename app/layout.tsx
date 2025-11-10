@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/lib/query-provider";
+import { AuthProvider } from "@/lib/auth-provider";
 import { config } from "@/lib/config";
 
 const inter = Inter({
@@ -15,6 +16,11 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["400", "700"],
+});
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
 });
 
 export const metadata: Metadata = {
@@ -67,16 +73,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={config.site.language} className={`${inter.variable} ${playfair.variable}`}>
+    <html lang={config.site.language} className={`${inter.variable} ${playfair.variable} ${geist.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" sizes="any" href="/assets/icons/file.svg" />
       </head>
       <body className="font-sans antialiased">
         <QueryProvider>
+          <AuthProvider>
           <TooltipProvider>
             {children}
             <Toaster />
           </TooltipProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

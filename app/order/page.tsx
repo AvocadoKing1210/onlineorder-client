@@ -1,0 +1,585 @@
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import OrderNavbar from '@/components/OrderNavbar'
+import { trackOrderRoute, clearOrderRouteTracking } from '@/lib/route-tracker'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
+import { Empty } from '@/components/ui/empty'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Plus, Minus, ShoppingCart, X, AlertCircle } from 'lucide-react'
+import { MenuCategorySection } from '@/components/menu/MenuCategorySection'
+import { MenuItemDialog } from '@/components/menu/MenuItemDialog'
+import {
+  getMenuCategories,
+  getMenuItems,
+  type MenuItemWithCategory,
+  type MenuItemWithModifiers,
+  type MenuCategory,
+} from '@/lib/api/menu'
+import { isValidUrl, parseImageUrl } from '@/lib/utils'
+import Image from 'next/image'
+
+// Cart Types with Modifiers Support
+interface CartItemModifier {
+  modifier_group_id: string
+  modifier_group_name: string
+  modifier_option_id: string
+  modifier_option_name: string
+  price_delta: number
+}
+
+interface CartItem {
+  id: string // Unique ID for this cart item (combination of menu_item_id + modifiers)
+  menu_item_id: string
+  menu_item_name: string
+  menu_item_description: string | null
+  menu_item_image_url: string | null
+  unit_price: number
+  quantity: number
+  modifiers: CartItemModifier[]
+  notes?: string
+  // Calculated
+  line_total: number // (unit_price + sum of modifier price_deltas) * quantity
+}
+
+export default function OrderPage() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const isMobile = useIsMobile()
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  // Track that user is on order page
+  useEffect(() => {
+    if (pathname === '/order') {
+      trackOrderRoute()
+    }
+    // Cleanup: clear tracking when component unmounts (user navigates away via direct link)
+    return () => {
+      // Only clear if navigating to home directly
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname
+        if (currentPath === '/') {
+          clearOrderRouteTracking()
+        }
+      }
+    }
+  }, [pathname])
+
+  // Fetch menu categories
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['menuCategories'],
+    queryFn: getMenuCategories,
+  })
+
+  // Fetch menu items
+  const { data: menuItems = [], isLoading: itemsLoading } = useQuery({
+    queryKey: ['menuItems'],
+    queryFn: getMenuItems,
+  })
+
+  // Group items by category
+  const itemsByCategory = useMemo(() => {
+    const grouped: Record<string, MenuItemWithCategory[]> = {}
+    menuItems.forEach((item) => {
+      const categoryId = item.category_id
+      if (!grouped[categoryId]) {
+        grouped[categoryId] = []
+      }
+      grouped[categoryId].push(item)
+    })
+    return grouped
+  }, [menuItems])
+
+  // Calculate total price
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + item.line_total, 0)
+  }
+
+  // Get total items count
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0)
+  }
+
+  // Generate unique ID for cart item based on menu item and modifiers
+  const generateCartItemId = (
+    menuItemId: string,
+    modifiers: CartItemModifier[]
+  ): string => {
+    const modifierKey = modifiers
+      .map((m) => `${m.modifier_group_id}:${m.modifier_option_id}`)
+      .sort()
+      .join(',')
+    return `${menuItemId}:${modifierKey}`
+  }
+
+  // Add item to cart with modifiers
+  const handleAddToCart = (
+    item: MenuItemWithModifiers,
+    selectedModifiers: Record<string, string[]>,
+    quantity: number = 1
+  ) => {
+    const basePrice = parseFloat(item.price)
+
+    // Build modifiers array
+    const modifiers: CartItemModifier[] = []
+    Object.entries(selectedModifiers).forEach(([groupId, optionIds]) => {
+      const group = item.modifier_groups.find((g) => g.id === groupId)
+      if (group) {
+        optionIds.forEach((optionId) => {
+          const option = group.options.find((o) => o.id === optionId)
+          if (option) {
+            modifiers.push({
+              modifier_group_id: groupId,
+              modifier_group_name: group.name,
+              modifier_option_id: optionId,
+              modifier_option_name: option.name,
+              price_delta: parseFloat(option.price_delta),
+            })
+          }
+        })
+      }
+    })
+
+    // Calculate modifier price delta
+    const modifierTotal = modifiers.reduce(
+      (sum, m) => sum + m.price_delta,
+      0
+    )
+    const unitPrice = basePrice + modifierTotal
+
+    // Generate unique ID
+    const cartItemId = generateCartItemId(item.id, modifiers)
+
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((ci) => ci.id === cartItemId)
+      if (existingItem) {
+        // Update quantity and recalculate line_total
+        return prevCart.map((ci) =>
+          ci.id === cartItemId
+            ? {
+                ...ci,
+                quantity: ci.quantity + quantity,
+                line_total: unitPrice * (ci.quantity + quantity),
+              }
+            : ci
+        )
+      }
+
+      // Add new item - parse image URL from JSON array if needed
+      const parsedImageUrl = parseImageUrl(item.image_url)
+      const newItem: CartItem = {
+        id: cartItemId,
+        menu_item_id: item.id,
+        menu_item_name: item.name,
+        menu_item_description: item.description,
+        menu_item_image_url: parsedImageUrl,
+        unit_price: unitPrice,
+        quantity: quantity,
+        modifiers,
+        line_total: unitPrice * quantity,
+      }
+
+      return [...prevCart, newItem]
+    })
+
+    setIsCartOpen(true)
+  }
+
+  // Handle item selection (open dialog)
+  const handleItemSelect = (item: MenuItemWithCategory) => {
+    setSelectedItemId(item.id)
+    setIsDialogOpen(true)
+  }
+
+  // Remove item from cart
+  const removeFromCart = (itemId: string) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId))
+  }
+
+  // Update item quantity
+  const updateQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(itemId)
+      return
+    }
+    setCart((prevCart) =>
+      prevCart.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            quantity,
+            line_total: item.unit_price * quantity,
+          }
+        }
+        return item
+      })
+    )
+  }
+
+  // Clear cart
+  const clearCart = () => {
+    setCart([])
+  }
+
+  const isLoading = categoriesLoading || itemsLoading
+
+  return (
+    <div className="min-h-screen bg-background">
+      <OrderNavbar 
+        onCartClick={() => setIsCartOpen(true)}
+        cartItemCount={getTotalItems()}
+      />
+      
+      {/* Cart Content Component */}
+      {(() => {
+        const cartContent = (
+          <>
+          {/* Cart Items */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4 min-h-0">
+            {cart.length === 0 ? (
+              <Empty
+                icon={
+                  <div className="rounded-md bg-muted p-3 border border-border">
+                    <ShoppingCart className="h-5 w-5 text-foreground" />
+                  </div>
+                }
+                title="Your cart is empty"
+                description="Add items from the menu to get started"
+                action={
+                  <Button
+                    onClick={() => {
+                      setIsCartOpen(false)
+                      // Scroll to top of menu after a brief delay
+                      setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }, 100)
+                    }}
+                    className="bg-foreground text-background hover:bg-foreground/90"
+                    size="default"
+                  >
+                    Start Shopping
+                  </Button>
+                }
+              >
+                {/* Recommendations */}
+                {menuItems.length > 0 && (
+                  <div className="px-4 sm:px-6">
+                    <p className="text-xs sm:text-sm font-medium text-foreground mb-3">
+                      Recommendations
+                    </p>
+                    <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 scrollbar-hide">
+                      {menuItems.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex-shrink-0 w-28 sm:w-32"
+                        >
+                          <Card
+                            className="border-card-border hover:shadow-md transition-shadow overflow-hidden"
+                          >
+                            <CardContent className="p-0">
+                              <div
+                                className="relative w-full aspect-square overflow-hidden cursor-pointer"
+                                onClick={() => {
+                                  setIsCartOpen(false)
+                                  handleItemSelect(item)
+                                }}
+                              >
+                                {(() => {
+                                  const imageUrl = parseImageUrl(item.image_url)
+                                  return isValidUrl(imageUrl) ? (
+                                    <Image
+                                      src={imageUrl!}
+                                      alt={item.name}
+                                      fill
+                                      className="object-cover hover:scale-105 transition-transform duration-300"
+                                      sizes="(max-width: 640px) 112px, 128px"
+                                      unoptimized={imageUrl?.startsWith('http')}
+                                    />
+                                  ) : (
+                                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                                    <ShoppingCart className="h-6 w-6 text-muted-foreground" />
+                                  </div>
+                                  )
+                                })()}
+                              </div>
+                              <div className="p-2">
+                                <p className="text-xs font-medium text-foreground line-clamp-2 mb-1.5">
+                                  {item.name}
+                                </p>
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="text-xs font-geist text-foreground">
+                                    ${parseFloat(item.price).toFixed(2)}
+                                  </span>
+                                  <Button
+                                    variant="default"
+                                    size="icon"
+                                    className="h-6 w-6 rounded-full bg-foreground text-background hover:bg-foreground/90 flex-shrink-0"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setIsCartOpen(false)
+                                      handleItemSelect(item)
+                                    }}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      ))}
+                    </div>
+              </div>
+                )}
+              </Empty>
+            ) : (
+              <>
+                {cart.map((item) => (
+                    <Card key={item.id} className="border-card-border">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex gap-3 sm:gap-4">
+                          {(() => {
+                            const imageUrl = parseImageUrl(item.menu_item_image_url)
+                            return isValidUrl(imageUrl) ? (
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-md overflow-hidden relative">
+                                <Image
+                                  src={imageUrl!}
+                                  alt={item.menu_item_name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="80px"
+                                  unoptimized={imageUrl?.startsWith('http')}
+                          />
+                        </div>
+                            ) : null
+                          })()}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-1 sm:mb-2 gap-2">
+                            <h3 className="font-semibold text-sm sm:text-base text-foreground truncate flex-1">
+                                {item.menu_item_name}
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 no-default-hover-elevate no-default-active-elevate"
+                                onClick={() => removeFromCart(item.id)}
+                            >
+                              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            </Button>
+                          </div>
+                            {/* Remove description in cart */}
+                            {/* Modifiers */}
+                            {item.modifiers.length > 0 && (
+                              <div className="mb-2 text-xs text-muted-foreground">
+                                <div className="border-l border-border space-y-1">
+                                  {item.modifiers.map((modifier, idx) => (
+                                    <div key={`${modifier.modifier_option_id}-${idx}`} className="pl-3">
+                                      {modifier.modifier_option_name}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8 no-default-hover-elevate no-default-active-elevate"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                              </Button>
+                              <span className="w-6 sm:w-8 text-center font-medium text-sm sm:text-base">
+                                {item.quantity}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8 no-default-hover-elevate no-default-active-elevate"
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                            <span className="font-geist text-base sm:text-lg text-foreground whitespace-nowrap">
+                              ${item.line_total.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Cart Footer */}
+          {cart.length > 0 && (
+              <div className="border-t pt-4 px-4 sm:px-6 pb-4 sm:pb-6 space-y-3">
+                <div className="flex items-center justify-between text-base sm:text-lg">
+                <span className="text-muted-foreground font-medium">Total</span>
+                <span className="font-geist text-xl sm:text-2xl text-foreground">
+                  ${getTotalPrice().toFixed(2)}
+                </span>
+              </div>
+                <div className="flex flex-col gap-2">
+                <Button
+                   className="w-full no-default-hover-elevate no-default-active-elevate bg-foreground text-background hover:bg-foreground/90 border-transparent"
+                  size="lg"
+                  onClick={() => {
+                    // TODO: Implement checkout
+                    alert('Checkout functionality coming soon!')
+                  }}
+                >
+                  Proceed to Checkout
+                </Button>
+                <Button
+                  variant="outline"
+                   className="w-full no-default-hover-elevate no-default-active-elevate"
+                  onClick={clearCart}
+                >
+                  Clear Cart
+                </Button>
+              </div>
+              </div>
+            )}
+          </>
+        )
+
+        return (
+          <>
+            {/* Mobile: Drawer */}
+            <Drawer open={isCartOpen && isMobile} onOpenChange={setIsCartOpen}>
+              <DrawerContent className="max-h-[96vh] flex flex-col">
+                <DrawerHeader className="text-left">
+                  <DrawerTitle className="font-display text-xl sm:text-2xl">
+                    Your Order
+                  </DrawerTitle>
+                  <DrawerDescription>
+                    {cart.length === 0 
+                      ? 'Your cart is empty' 
+                      : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
+                  </DrawerDescription>
+                </DrawerHeader>
+                {cartContent}
+        </DrawerContent>
+      </Drawer>
+
+            {/* Desktop: Sheet */}
+            <Sheet open={isCartOpen && !isMobile} onOpenChange={setIsCartOpen}>
+              <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0">
+                <SheetHeader className="px-6 pt-6 pb-4">
+                  <SheetTitle className="font-display text-xl sm:text-2xl">
+                    Your Order
+                  </SheetTitle>
+                  <SheetDescription>
+                    {cart.length === 0 
+                      ? 'Your cart is empty' 
+                      : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+                  {cartContent}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </>
+        )
+      })()}
+
+      {/* Main Content */}
+      <div className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-6 md:mb-8">
+            <div>
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl mb-2 text-foreground">
+                Order Online
+              </h1>
+              <p className="text-base sm:text-lg text-muted-foreground">
+                Select items from our menu to add to your order
+              </p>
+            </div>
+          </div>
+
+          <Separator className="mb-8" />
+
+          {/* Menu Content */}
+          {isLoading ? (
+            <div className="space-y-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="h-8 w-48" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {[1, 2, 3].map((j) => (
+                      <Skeleton key={j} className="h-64" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : categories.length === 0 ? (
+          <div className="text-center py-16">
+              <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground text-base sm:text-lg">
+                No menu items available at this time
+            </p>
+          </div>
+          ) : (
+            <div className="space-y-12 sm:space-y-16">
+              {categories.map((category) => {
+                const items = itemsByCategory[category.id] || []
+                if (items.length === 0) return null
+
+                return (
+                  <MenuCategorySection
+                    key={category.id}
+                    category={category}
+                    items={items}
+                    onItemSelect={handleItemSelect}
+                  />
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Menu Item Dialog */}
+      <MenuItemDialog
+        itemId={selectedItemId}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onAddToCart={handleAddToCart}
+      />
+    </div>
+  )
+}
