@@ -159,12 +159,12 @@ export default function LoginPage() {
                   <Button
                     onClick={handleLogin}
                     disabled={isLoggingIn}
-                    className="w-full"
+                    className="w-full bg-foreground text-background hover:bg-foreground/90 border-transparent"
                     size="lg"
                   >
                     {isLoggingIn ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background mr-2"></div>
                         Signing in...
                       </>
                     ) : (

@@ -79,7 +79,7 @@ export async function getSupabaseClient() {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-    },
+      },
   })
 
   return supabaseClient
@@ -184,6 +184,26 @@ export async function getJWTClaims(): Promise<any> {
     return claims || null
   } catch (error) {
     console.error('Error getting JWT claims:', error)
+    return null
+  }
+}
+
+/**
+ * Get Auth0 ID token as raw JWT string
+ * Returns null if user is not authenticated
+ */
+export async function getAuth0Token(): Promise<string | null> {
+  try {
+    const auth0 = await getAuth0Client()
+    if (!auth0) return null
+    
+    const isAuth = await auth0.isAuthenticated()
+    if (!isAuth) return null
+    
+    const claims = await auth0.getIdTokenClaims()
+    return claims?.__raw || null
+  } catch (error) {
+    console.error('Error getting Auth0 token:', error)
     return null
   }
 }
