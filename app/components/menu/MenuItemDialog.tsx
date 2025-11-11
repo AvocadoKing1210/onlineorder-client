@@ -20,7 +20,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ModifierGroupSelector } from './ModifierGroupSelector'
+import { MenuItemReviews } from './MenuItemReviews'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIsMobile } from '@/hooks/use-mobile'
 import {
@@ -192,16 +194,24 @@ export function MenuItemDialog({
             </div>
 
             {/* Content - Right Side (Scrollable) */}
-            <div className="flex-1 min-w-0 overflow-y-auto scrollbar-hide space-y-4 sm:space-y-6 pb-4">
+            <div className="flex-1 min-w-0 overflow-y-auto scrollbar-hide pb-4">
               {/* Availability Notes */}
               {item.availability_notes && (
+                <div className="mb-4">
                 <p className="text-sm text-muted-foreground italic">
                   {item.availability_notes}
                 </p>
+                </div>
               )}
 
-              <Separator />
-
+              {/* Tabs for Customize and Reviews */}
+              <Tabs defaultValue="customize" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="customize">Customize</TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="customize" className="mt-4 space-y-6 min-h-[300px]">
               {/* Modifier Groups */}
               {item.modifier_groups.length > 0 ? (
                 <div className="space-y-6">
@@ -221,6 +231,15 @@ export function MenuItemDialog({
                   No customization options available for this item.
                 </p>
               )}
+                </TabsContent>
+                
+                <TabsContent value="reviews" className="mt-4 min-h-[300px]">
+                  <MenuItemReviews 
+                    menuItemId={item.id} 
+                    menuItemName={item.name}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
 

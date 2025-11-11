@@ -5,8 +5,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { type MenuItemWithCategory } from '@/lib/api/menu'
 import { isValidUrl, parseImageUrl } from '@/lib/utils'
-import { Plus } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { getMenuItemAverageRating } from '@/lib/api/reviews'
+import { Plus, Star } from 'lucide-react'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
 
 interface MenuItemCardProps {
   item: MenuItemWithCategory
@@ -18,6 +21,12 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
   const imageUrl = parseImageUrl(item.image_url)
   const hasImage = isValidUrl(imageUrl)
   const primaryTag = item.dietary_tags?.[0] ?? null
+
+  // Fetch average rating
+  const { data: ratingData } = useQuery({
+    queryKey: ['averageRating', item.id],
+    queryFn: () => getMenuItemAverageRating(item.id),
+  })
 
   return (
     <Card className="group hover:shadow-md transition-shadow border-card-border overflow-hidden w-full">
@@ -70,6 +79,24 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
                 <p className="text-xs text-muted-foreground mb-1.5 line-clamp-1">
                   {item.description}
                 </p>
+              )}
+              
+              {/* Rating */}
+              {ratingData && (
+                <div className="flex items-center gap-1 mb-1.5">
+                  <div className="flex items-center gap-0.5">
+                    <Star className={cn(
+                      "h-3 w-3",
+                      "fill-yellow-400 text-yellow-400"
+                    )} />
+                    <span className="text-xs font-medium text-foreground">
+                      {ratingData.average.toFixed(1)}
+                    </span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs h-4 px-1.5 rounded-full">
+                    {ratingData.count}
+                  </Badge>
+                </div>
               )}
               
               {/* Availability Notes */}

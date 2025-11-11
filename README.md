@@ -18,21 +18,34 @@ A configurable Next.js template for restaurant websites. Easily customize for di
    npm install
    ```
 
-2. **Configure your restaurant**:
+2. **Configure environment variables**:
+   Create a `.env.local` file in the root directory with:
+   ```bash
+   # Cloudflare Workers URLs
+   NEXT_PUBLIC_CLOUDFLARE_ORDER_URL=https://your-orders-worker.workers.dev
+   NEXT_PUBLIC_CLOUDFLARE_PROFILE_URL=https://your-profile-worker.workers.dev
+   NEXT_PUBLIC_CLOUDFLARE_REVIEW_URL=https://your-reviews-worker.workers.dev
+   
+   # Supabase (if using direct Supabase client)
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+3. **Configure your restaurant**:
    - Edit `app/config.json` with your restaurant's information
    - See `TEMPLATE_SETUP.md` for detailed configuration guide
    - Use `config.example.json` as a reference
 
-3. **Add your images**:
+4. **Add your images**:
    - Place images in `public/assets/stock_images/`
    - Reference them in config using `@assets/stock_images/` prefix
 
-4. **Run development server**:
+5. **Run development server**:
    ```bash
    npm run dev
    ```
 
-5. **Build for production**:
+6. **Build for production**:
    ```bash
    npm run build
    npm start
