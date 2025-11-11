@@ -276,6 +276,7 @@ export function CheckoutForm({ onSubmit, isSubmitting = false }: CheckoutFormPro
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          className="border-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground data-[state=checked]:text-background"
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">

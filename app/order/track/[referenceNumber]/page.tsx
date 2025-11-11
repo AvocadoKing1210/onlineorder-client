@@ -10,10 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import { ArrowLeft, Clock, Copy, Check } from 'lucide-react'
+import { ArrowLeft, Clock, Copy, Check, CheckCircle2, RefreshCcw } from 'lucide-react'
 import OrderNavbar from '@/components/OrderNavbar'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 // Order status configuration - simple labels only
 const STATUS_CONFIG: Record<string, { label: string }> = {
@@ -57,6 +58,7 @@ export default function OrderTrackingPage() {
   const router = useRouter()
   const { toast } = useToast()
   const referenceNumber = params.referenceNumber as string
+  const isMobile = useIsMobile()
 
   const [order, setOrder] = useState<OrderDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -390,7 +392,8 @@ export default function OrderTrackingPage() {
           <div className="flex items-center justify-between">
             <Button
               onClick={() => router.push('/order')}
-              className="gap-2 bg-foreground text-background hover:bg-foreground/90 border-transparent"
+              variant="ghost"
+              className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Menu
@@ -403,12 +406,19 @@ export default function OrderTrackingPage() {
                 </div>
               )}
               <Button
-                size="sm"
+                size={isMobile ? "icon" : "sm"}
+                variant="ghost"
                 onClick={() => loadOrder()}
-                className="gap-2 bg-foreground text-background hover:bg-foreground/90 border-transparent"
+                className={isMobile ? "" : "gap-2"}
               >
-                <Clock className="h-4 w-4" />
-                Refresh
+                {isMobile ? (
+                  <RefreshCcw className="h-4 w-4" />
+                ) : (
+                  <>
+                    <RefreshCcw className="h-4 w-4" />
+                    Refresh
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -441,14 +451,21 @@ export default function OrderTrackingPage() {
                     </Button>
                   </div>
                 </div>
-                {order.estimated_preparation_minutes && remainingMinutes !== null ? (
+                {order.status === 'ready' || order.status === 'completed' ? (
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Ready at</p>
+                    <p className="text-2xl font-semibold tabular-nums">
+                      {new Date(order.updated_at).toLocaleTimeString()}
+                    </p>
+                  </div>
+                ) : order.estimated_preparation_minutes && remainingMinutes !== null && (order.status === 'accepted' || order.status === 'in_progress') ? (
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated wait time</p>
                     <p className="text-2xl font-semibold tabular-nums">
                       {remainingMinutes > 0 ? `${remainingMinutes} min` : 'Ready soon'}
                     </p>
                   </div>
-                ) : order.estimated_preparation_minutes ? (
+                ) : order.estimated_preparation_minutes && (order.status === 'accepted' || order.status === 'in_progress') ? (
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated wait time</p>
                     <p className="text-2xl font-semibold tabular-nums">{order.estimated_preparation_minutes} min</p>
@@ -472,19 +489,27 @@ export default function OrderTrackingPage() {
                     const isActive = index <= currentStatusIndex
                     const isCurrent = order.status === status
                     const isLast = index === STATUS_PROGRESSION.length - 1
+                    // Show spinner on the NEXT status after current (waiting for it)
+                    // e.g., if current is "submitted" (index 0), show spinner on "accepted" (index 1)
+                    const nextStatusIndex = currentStatusIndex + 1
+                    const isWaitingForThis = index === nextStatusIndex && !isFinished && currentStatusIndex >= 0
+                    // Completed states show check icon (all statuses up to and including current)
+                    const isCompleted = index <= currentStatusIndex
 
                     return (
                       <div key={status} className="flex items-start gap-4">
                         {/* Timeline dot and line */}
                         <div className="flex flex-col items-center">
-                          <div className="w-3 h-3 flex items-center justify-center my-2">
-                            {isCurrent && !isFinished ? (
-                              <Spinner size="sm" />
+                          <div className="w-5 h-5 flex items-center justify-center mb-2 mt-2">
+                            {isWaitingForThis ? (
+                              <Spinner size="sm" className="h-5 w-5" />
+                            ) : isCompleted ? (
+                              <CheckCircle2 className="h-5 w-5 text-foreground" />
                             ) : (
                               <div
                                 className={cn(
                                   "w-2 h-2 rounded-full transition-colors",
-                                  isActive ? "bg-foreground" : "bg-muted-foreground/30"
+                                  "bg-muted-foreground/30"
                                 )}
                               />
                             )}
@@ -503,7 +528,7 @@ export default function OrderTrackingPage() {
                         <div className="flex-1 pb-4">
                           <p
                             className={cn(
-                              "font-medium",
+                              "font-medium mt-1.5",
                               isActive ? "text-foreground" : "text-muted-foreground"
                             )}
                           >
@@ -527,14 +552,9 @@ export default function OrderTrackingPage() {
                               )}
                             </div>
                           )}
-                          {isCurrent && order.status === 'ready' && (
+                          {isCurrent && (order.status === 'ready' || order.status === 'completed') && (
                             <p className="text-xs text-muted-foreground mt-1">
-                              Your order is ready for pickup!
-                            </p>
-                          )}
-                          {isCurrent && order.status === 'submitted' && order.estimated_preparation_minutes && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Estimated wait time: {order.estimated_preparation_minutes} minutes
+                              Ready at {new Date(order.updated_at).toLocaleTimeString()}
                             </p>
                           )}
                         </div>
@@ -551,13 +571,13 @@ export default function OrderTrackingPage() {
                 <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
                   Order Items
                 </h3>
-                <div className="space-y-3">
+                <ul className="space-y-3 pl-6 list-disc">
                   {order.items?.map((item) => {
                     const totalItems = order.items?.length || 0
                     const showBadge = totalItems > 1
                     
                     return (
-                      <div key={item.id} className="flex items-center justify-between py-2">
+                      <li key={item.id} className="flex items-center justify-between py-2">
                         <div className="flex-1 flex items-center gap-2">
                           <p className="font-medium">{item.item_name}</p>
                           {showBadge && (
@@ -567,10 +587,10 @@ export default function OrderTrackingPage() {
                           )}
                         </div>
                         <p className="font-semibold">${parseFloat(item.line_total).toFixed(2)}</p>
-                      </div>
+                      </li>
                     )
                   })}
-                </div>
+                </ul>
               </div>
 
               <Separator />
