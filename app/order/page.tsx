@@ -39,8 +39,14 @@ import {
   type MenuItemWithModifiers,
   type MenuCategory,
 } from '@/lib/api/menu'
+import { submitOrder, generateIdempotencyKey, saveGuestOrderReference, type CartItem as OrderCartItem } from '@/lib/api/orders'
+import { getUser, isAuthenticated, getAuth0Token } from '@/lib/auth'
 import { isValidUrl, parseImageUrl } from '@/lib/utils'
 import Image from 'next/image'
+import { useToast } from '@/hooks/use-toast'
+import { CheckoutDialog } from '@/components/checkout/CheckoutDialog'
+import type { CheckoutFormData } from '@/components/checkout/CheckoutForm'
+import { saveProfileFromCheckout } from '@/lib/api/profile'
 
 // Cart Types with Modifiers Support
 interface CartItemModifier {
@@ -65,6 +71,43 @@ interface CartItem {
   line_total: number // (unit_price + sum of modifier price_deltas) * quantity
 }
 
+// LocalStorage key for cart persistence
+const CART_STORAGE_KEY = 'order_system_cart'
+
+// Helper functions for localStorage operations
+const loadCartFromStorage = (): CartItem[] => {
+  if (typeof window === 'undefined') return []
+  
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY)
+    if (!stored) return []
+    
+    const parsed = JSON.parse(stored)
+    // Validate that parsed data is an array
+    if (Array.isArray(parsed)) {
+      return parsed
+    }
+    return []
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error)
+    return []
+  }
+}
+
+const saveCartToStorage = (cart: CartItem[]): void => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
+  } catch (error) {
+    console.error('Error saving cart to localStorage:', error)
+    // Handle quota exceeded error gracefully
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, cart not saved')
+    }
+  }
+}
+
 export default function OrderPage() {
   const router = useRouter()
   const pathname = usePathname()
@@ -73,6 +116,27 @@ export default function OrderPage() {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isCartLoaded, setIsCartLoaded] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isCheckoutDialogOpen, setIsCheckoutDialogOpen] = useState(false)
+  const { toast } = useToast()
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = loadCartFromStorage()
+    if (savedCart.length > 0) {
+      setCart(savedCart)
+    }
+    setIsCartLoaded(true)
+  }, [])
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    // Only save after initial load to avoid overwriting with empty cart
+    if (isCartLoaded) {
+      saveCartToStorage(cart)
+    }
+  }, [cart, isCartLoaded])
 
   // Track that user is on order page
   useEffect(() => {
@@ -100,7 +164,7 @@ export default function OrderPage() {
   // Fetch menu items
   const { data: menuItems = [], isLoading: itemsLoading } = useQuery({
     queryKey: ['menuItems'],
-    queryFn: getMenuItems,
+    queryFn: () => getMenuItems(),
   })
 
   // Group items by category
@@ -245,6 +309,121 @@ export default function OrderPage() {
   // Clear cart
   const clearCart = () => {
     setCart([])
+    // Clear from localStorage as well
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CART_STORAGE_KEY)
+      } catch (error) {
+        console.error('Error clearing cart from localStorage:', error)
+      }
+    }
+  }
+
+  // Handle checkout button click - open checkout dialog
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      toast({
+        title: 'Cart is empty',
+        description: 'Please add items to your cart before checkout',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsCheckoutDialogOpen(true)
+  }
+
+  // Handle checkout form submission
+  const handleCheckoutSubmit = async (formData: CheckoutFormData) => {
+    setIsSubmitting(true)
+
+    try {
+      // Check if user is authenticated
+      const authenticated = await isAuthenticated()
+      let authToken: string | undefined
+      let userId: string | undefined
+
+      if (authenticated) {
+        // Get Auth0 token for authenticated users
+        const user = await getUser()
+        if (user?.sub) {
+          userId = user.sub
+          authToken = await getAuth0Token() || undefined
+        }
+      } else {
+        // Guest checkout - generate guest user_id
+        userId = `guest-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+      }
+
+      // Save profile if requested (for logged-in users)
+      if (authenticated && formData.save_to_profile && !formData.use_existing_profile) {
+        try {
+          await saveProfileFromCheckout(
+            formData.customer_name,
+            formData.customer_email,
+            formData.customer_phone
+          )
+        } catch (error) {
+          console.error('Error saving profile:', error)
+          // Don't block order submission if profile save fails
+        }
+      }
+
+      // Convert cart items to API format
+      const orderCart: OrderCartItem[] = cart.map(item => ({
+        menu_item_id: item.menu_item_id,
+        quantity: item.quantity,
+        modifiers: item.modifiers.map(m => ({
+          modifier_option_id: m.modifier_option_id,
+        })),
+        notes: item.notes,
+      }))
+
+      // Submit order with customer information
+      const response = await submitOrder(
+        {
+          cart: orderCart,
+          mode: formData.mode,
+          special_instructions: formData.special_instructions,
+          idempotency_key: generateIdempotencyKey(),
+          user_id: userId,
+          customer_name: formData.customer_name,
+          customer_email: formData.customer_email,
+          customer_phone: formData.customer_phone,
+        },
+        authToken
+      )
+
+      // Success!
+      toast({
+        title: 'Order submitted successfully!',
+        description: `Order #${response.reference_number} - Total: $${response.total_amount}`,
+      })
+
+      // Save reference number for guest users (for order history)
+      if (response.reference_number && !authenticated) {
+        saveGuestOrderReference(response.reference_number)
+      }
+
+      // Clear cart and close dialogs
+      clearCart()
+      setIsCartOpen(false)
+      setIsCheckoutDialogOpen(false)
+
+      // Navigate to order tracking page
+      if (response.reference_number) {
+        router.push(`/order/track/${response.reference_number}`)
+      }
+    } catch (error: any) {
+      console.error('Error submitting order:', error)
+      toast({
+        title: 'Failed to submit order',
+        description: error.message || 'Please try again',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isLoading = categoriesLoading || itemsLoading
@@ -454,12 +633,10 @@ export default function OrderPage() {
                 <Button
                    className="w-full no-default-hover-elevate no-default-active-elevate bg-foreground text-background hover:bg-foreground/90 border-transparent"
                   size="lg"
-                  onClick={() => {
-                    // TODO: Implement checkout
-                    alert('Checkout functionality coming soon!')
-                  }}
+                  onClick={handleCheckout}
+                  disabled={isSubmitting || cart.length === 0}
                 >
-                  Proceed to Checkout
+                  {isSubmitting ? 'Submitting...' : 'Proceed to Checkout'}
                 </Button>
                 <Button
                   variant="outline"
@@ -579,6 +756,14 @@ export default function OrderPage() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onAddToCart={handleAddToCart}
+      />
+
+      {/* Checkout Dialog */}
+      <CheckoutDialog
+        open={isCheckoutDialogOpen}
+        onOpenChange={setIsCheckoutDialogOpen}
+        onSubmit={handleCheckoutSubmit}
+        isSubmitting={isSubmitting}
       />
     </div>
   )

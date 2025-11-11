@@ -69,6 +69,18 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
               </button>
             ))}
             
+            {/* Order History Link */}
+            <button
+              onClick={() => {
+                router.push('/order/history')
+                setIsMobileMenuOpen(false)
+              }}
+              className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-colors"
+              data-testid="nav-order-history"
+            >
+              Order History
+            </button>
+            
             {/* Desktop Cart Button */}
             {onCartClick && (
               <Button
@@ -111,10 +123,9 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
               </Button>
             ) : (
               <Button
-                variant="ghost"
                 size="sm"
                 onClick={() => setIsAuthDialogOpen(true)}
-                className="text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground"
+                className="bg-foreground text-background hover:bg-foreground/90 border-transparent text-sm tracking-widest uppercase"
               >
                 {isLoading ? (
                   <Skeleton className="h-4 w-16" />
@@ -210,6 +221,18 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 {item.label}
               </button>
             ))}
+            
+            {/* Mobile Order History Link */}
+            <button
+              onClick={() => {
+                router.push('/order/history')
+                setIsMobileMenuOpen(false)
+              }}
+              className="text-left text-sm tracking-widest uppercase text-foreground/80 hover:text-foreground transition-all duration-200 py-2 transform hover:translate-x-2"
+              data-testid="nav-order-history-mobile"
+            >
+              Order History
+            </button>
             
             {/* Mobile Sign In Button (only show if not logged in) */}
             {!isAuthenticated && (

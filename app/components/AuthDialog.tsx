@@ -170,7 +170,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
               <Button
                 onClick={handleLogin}
                 disabled={isLoggingIn}
-                className="w-full"
+                className="w-full bg-foreground text-background hover:bg-foreground/90 border-transparent"
                 size="lg"
               >
                 {isLoggingIn ? 'Signing in...' : 'Sign In'}
