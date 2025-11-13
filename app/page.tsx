@@ -50,76 +50,13 @@ export default function Home() {
     const container = containerRef.current;
     if (!container) return;
 
-    // Apply scroll snap styles to html element
-    document.documentElement.style.scrollSnapType = 'y mandatory';
+    // Apply scroll snap styles to html element with CSS-based snapping
+    document.documentElement.style.scrollSnapType = 'y proximity'; // Changed from 'mandatory' to 'proximity' for smoother scrolling
     document.documentElement.style.scrollBehavior = 'smooth';
     document.documentElement.style.overflowY = 'scroll';
     document.documentElement.style.height = '100%';
 
-    // Handle wheel events for smoother snapping
-    let wheelTimeout: NodeJS.Timeout;
-    const handleWheel = (e: WheelEvent) => {
-      if (isScrollingRef.current) {
-        e.preventDefault();
-        return;
-      }
-
-      // Check if we're in the menu section and scrolling horizontally
-      const menuSection = document.getElementById('menu');
-      if (menuSection) {
-        const menuRect = menuSection.getBoundingClientRect();
-        const isInMenuSection = menuRect.top <= window.innerHeight / 2 && menuRect.bottom >= window.innerHeight / 2;
-        
-        // If scrolling horizontally in menu section, allow it
-        if (isInMenuSection && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          return; // Don't prevent default, allow horizontal scroll
-        }
-      }
-
-      const delta = e.deltaY;
-      
-      // Find the section closest to the viewport center
-      let currentSection = 0;
-      let minDistance = Infinity;
-      const viewportCenter = window.innerHeight / 2;
-      
-      sections.forEach((id, index) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        const rect = element.getBoundingClientRect();
-        const sectionCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(sectionCenter - viewportCenter);
-        
-        if (distance < minDistance) {
-          minDistance = distance;
-          currentSection = index;
-      }
-      });
-
-      if (Math.abs(delta) > 50) {
-        isScrollingRef.current = true;
-        e.preventDefault();
-
-        let nextIndex = currentSection;
-        if (delta > 0 && currentSection < sections.length - 1) {
-          nextIndex = currentSection + 1;
-        } else if (delta < 0 && currentSection > 0) {
-          nextIndex = currentSection - 1;
-        }
-
-        const nextSection = document.getElementById(sections[nextIndex]);
-        if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        clearTimeout(wheelTimeout);
-        wheelTimeout = setTimeout(() => {
-          isScrollingRef.current = false;
-        }, 1000);
-      }
-    };
-
-    // Handle touch events for mobile swipe
+    // Simplified touch handling - no preventDefault for smoother mobile scrolling
     let touchStartY = 0;
     let touchEndY = 0;
 
@@ -127,64 +64,47 @@ export default function Home() {
       touchStartY = e.touches[0].clientY;
     };
 
-    const handleTouchEnd = (e: TouchEvent) => {
-      touchEndY = e.changedTouches[0].clientY;
-      const diff = touchStartY - touchEndY;
-
-      if (Math.abs(diff) > 50 && !isScrollingRef.current) {
-        isScrollingRef.current = true;
-        
-        // Find the section closest to the viewport center
-        let currentSection = 0;
-        let minDistance = Infinity;
-        const viewportCenter = window.innerHeight / 2;
-        
-        sections.forEach((id, index) => {
-          const element = document.getElementById(id);
-          if (!element) return;
-          const rect = element.getBoundingClientRect();
-          const sectionCenter = rect.top + rect.height / 2;
-          const distance = Math.abs(sectionCenter - viewportCenter);
-          
-          if (distance < minDistance) {
-            minDistance = distance;
-            currentSection = index;
-        }
-        });
-
-        let nextIndex = currentSection;
-        if (diff > 0 && currentSection < sections.length - 1) {
-          nextIndex = currentSection + 1;
-        } else if (diff < 0 && currentSection > 0) {
-          nextIndex = currentSection - 1;
-        }
-
-        const nextSection = document.getElementById(sections[nextIndex]);
-        if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        setTimeout(() => {
-          isScrollingRef.current = false;
-        }, 1000);
-      }
+    const handleTouchMove = (e: TouchEvent) => {
+      touchEndY = e.touches[0].clientY;
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
-      window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
-      clearTimeout(wheelTimeout);
+      window.removeEventListener('touchmove', handleTouchMove);
       document.documentElement.style.scrollSnapType = '';
       document.documentElement.style.scrollBehavior = '';
       document.documentElement.style.overflowY = '';
       document.documentElement.style.height = '';
     };
   }, [sections]);
+
+  // Preload critical images for better performance
+  useEffect(() => {
+    const preloadImages = [
+      config.hero.backgroundImage ? resolveImagePath(config.hero.backgroundImage) : null,
+      ...dishes.slice(0, 2).map(dish => dish.image).filter(Boolean),
+    ].filter(Boolean) as string[]
+
+    preloadImages.forEach((imagePath) => {
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = imagePath
+      document.head.appendChild(link)
+    })
+
+    return () => {
+      // Cleanup: remove preload links
+      document.querySelectorAll('link[rel="preload"][as="image"]').forEach((link) => {
+        if (preloadImages.includes((link as HTMLLinkElement).href)) {
+          link.remove()
+        }
+      })
+    }
+  }, [])
 
   // Add structured data for SEO/GEO
   useEffect(() => {

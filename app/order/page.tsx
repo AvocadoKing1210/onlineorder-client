@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -167,7 +167,7 @@ export default function OrderPage() {
     queryFn: () => getMenuItems(),
   })
 
-  // Group items by category
+  // Group items by category - memoized for performance
   const itemsByCategory = useMemo(() => {
     const grouped: Record<string, MenuItemWithCategory[]> = {}
     menuItems.forEach((item) => {
@@ -275,11 +275,11 @@ export default function OrderPage() {
     setIsCartOpen(true)
   }
 
-  // Handle item selection (open dialog)
-  const handleItemSelect = (item: MenuItemWithCategory) => {
+  // Handle item selection (open dialog) - memoized with useCallback
+  const handleItemSelect = useCallback((item: MenuItemWithCategory) => {
     setSelectedItemId(item.id)
     setIsDialogOpen(true)
-  }
+  }, [])
 
   // Remove item from cart
   const removeFromCart = (itemId: string) => {
@@ -319,8 +319,8 @@ export default function OrderPage() {
     }
   }
 
-  // Handle checkout button click - open checkout dialog
-  const handleCheckout = () => {
+  // Handle checkout button click - open checkout dialog - memoized with useCallback
+  const handleCheckout = useCallback(() => {
     if (cart.length === 0) {
       toast({
         title: 'Cart is empty',
@@ -331,7 +331,7 @@ export default function OrderPage() {
     }
 
     setIsCheckoutDialogOpen(true)
-  }
+  }, [cart.length, toast])
 
   // Handle checkout form submission
   const handleCheckoutSubmit = async (formData: CheckoutFormData) => {
@@ -498,6 +498,7 @@ export default function OrderPage() {
                                       fill
                                       className="object-cover hover:scale-105 transition-transform duration-300"
                                       sizes="(max-width: 640px) 112px, 128px"
+                                      loading="lazy"
                                       unoptimized={imageUrl?.startsWith('http')}
                                     />
                                   ) : (
@@ -553,6 +554,7 @@ export default function OrderPage() {
                                   fill
                                   className="object-cover"
                                   sizes="80px"
+                                  loading="lazy"
                                   unoptimized={imageUrl?.startsWith('http')}
                           />
                         </div>

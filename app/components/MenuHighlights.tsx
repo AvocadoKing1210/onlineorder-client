@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 
 interface Dish {
   name: string;
@@ -187,11 +188,15 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                   >
                     <Card className="overflow-hidden hover-elevate transition-transform duration-300 w-full h-auto md:h-[70vh] flex flex-col md:flex-row">
                       {/* Image - full width on mobile, half on desktop */}
-                      <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden">
-                      <img
+                      <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
+                      <Image
                         src={dish.image}
                         alt={dish.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority={index === 0}
+                        loading={index === 0 ? undefined : "lazy"}
                         data-testid={`img-dish-${index}`}
                       />
                     </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,15 +22,45 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
   const imageUrl = parseImageUrl(item.image_url)
   const hasImage = isValidUrl(imageUrl)
   const primaryTag = item.dietary_tags?.[0] ?? null
+  const [shouldFetchRating, setShouldFetchRating] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
 
-  // Fetch average rating
+  // Only fetch rating when card is visible in viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShouldFetchRating(true)
+            observer.disconnect()
+          }
+        })
+      },
+      {
+        rootMargin: '100px',
+        threshold: 0.01,
+      }
+    )
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current)
+    }
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  // Fetch average rating only when visible
   const { data: ratingData } = useQuery({
     queryKey: ['averageRating', item.id],
     queryFn: () => getMenuItemAverageRating(item.id),
+    enabled: shouldFetchRating, // Only fetch when card is visible
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 
   return (
-    <Card className="group hover:shadow-md transition-shadow border-card-border overflow-hidden w-full">
+    <Card ref={cardRef} className="group hover:shadow-md transition-shadow border-card-border overflow-hidden w-full">
       <CardContent className="p-0">
         <div className="flex flex-row gap-0">
           {/* Image */}
@@ -41,6 +72,7 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 112px, 144px"
+                loading="lazy"
                 unoptimized={imageUrl?.startsWith('http')}
               />
               {primaryTag && (

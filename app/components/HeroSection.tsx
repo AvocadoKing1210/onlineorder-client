@@ -54,6 +54,7 @@ export default function HeroSection({
             loop
             muted
             playsInline
+            preload="auto"
             data-testid="hero-background-video"
             onError={(e) => {
               // Hide video if it fails to load, show image fallback
