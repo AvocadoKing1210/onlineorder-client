@@ -99,6 +99,7 @@ export async function getMenuCategories(): Promise<MenuCategory[]> {
 
 /**
  * Fetch visible menu items with their categories
+ * Automatically excludes soft-deleted items (deleted_at IS NULL)
  */
 export async function getMenuItems(filters?: MenuItemFilters): Promise<MenuItemWithCategory[]> {
   const supabase = await getSupabaseClientForAPI()
@@ -113,6 +114,7 @@ export async function getMenuItems(filters?: MenuItemFilters): Promise<MenuItemW
       )
     `)
     .eq('visible', true)
+    .is('deleted_at', null) // Exclude soft-deleted items
 
   if (filters?.category_id) {
     query = query.eq('category_id', filters.category_id)
@@ -144,6 +146,7 @@ export async function getMenuItems(filters?: MenuItemFilters): Promise<MenuItemW
 
 /**
  * Fetch menu item with full details including modifier groups
+ * Automatically excludes soft-deleted items (deleted_at IS NULL)
  */
 export async function getMenuItemWithModifiers(id: string): Promise<MenuItemWithModifiers | null> {
   const supabase = await getSupabaseClientForAPI()
@@ -154,6 +157,7 @@ export async function getMenuItemWithModifiers(id: string): Promise<MenuItemWith
     .select('*')
     .eq('id', id)
     .eq('visible', true)
+    .is('deleted_at', null) // Exclude soft-deleted items
     .single()
 
   if (itemError || !item) {
