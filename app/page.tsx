@@ -30,10 +30,13 @@ export default function Home() {
     image: resolveImagePath(dish.image)
   }));
 
-  // Map printable menu items with images
-  const printableMenuItems = config.printableMenu.items.map(item => ({
+  // Map printable menu categories with images
+  const printableMenuCategories = config.printableMenu.categories.map(category => ({
+    ...category,
+    items: category.items.map(item => ({
     ...item,
     image: resolveImagePath(item.image)
+    }))
   }));
 
   // Location details (empty array since we only show address and map)
@@ -74,17 +77,24 @@ export default function Home() {
       }
 
       const delta = e.deltaY;
-      let currentSection = sections.findIndex((id) => {
+      
+      // Find the section closest to the viewport center
+      let currentSection = 0;
+      let minDistance = Infinity;
+      const viewportCenter = window.innerHeight / 2;
+      
+      sections.forEach((id, index) => {
         const element = document.getElementById(id);
-        if (!element) return false;
+        if (!element) return;
         const rect = element.getBoundingClientRect();
-        return rect.top >= 0 && rect.top < window.innerHeight / 2;
-      });
-
-      // If no section found, default to first section
-      if (currentSection === -1) {
-        currentSection = 0;
+        const sectionCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(sectionCenter - viewportCenter);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          currentSection = index;
       }
+      });
 
       if (Math.abs(delta) > 50) {
         isScrollingRef.current = true;
@@ -123,17 +133,24 @@ export default function Home() {
 
       if (Math.abs(diff) > 50 && !isScrollingRef.current) {
         isScrollingRef.current = true;
-        let currentSection = sections.findIndex((id) => {
+        
+        // Find the section closest to the viewport center
+        let currentSection = 0;
+        let minDistance = Infinity;
+        const viewportCenter = window.innerHeight / 2;
+        
+        sections.forEach((id, index) => {
           const element = document.getElementById(id);
-          if (!element) return false;
+          if (!element) return;
           const rect = element.getBoundingClientRect();
-          return rect.top >= 0 && rect.top < window.innerHeight / 2;
-        });
-
-        // If no section found, default to first section
-        if (currentSection === -1) {
-          currentSection = 0;
+          const sectionCenter = rect.top + rect.height / 2;
+          const distance = Math.abs(sectionCenter - viewportCenter);
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentSection = index;
         }
+        });
 
         let nextIndex = currentSection;
         if (diff > 0 && currentSection < sections.length - 1) {
@@ -264,7 +281,7 @@ export default function Home() {
         <PrintableMenu
           title={config.printableMenu.title}
           subtitle={config.printableMenu.subtitle}
-          items={printableMenuItems}
+          categories={printableMenuCategories}
         />
       </div>
       
@@ -272,7 +289,7 @@ export default function Home() {
         <ReservationCTA
           title={config.reservation.title}
           description={config.reservation.description}
-          backgroundImage={resolveImagePath(config.reservation.backgroundImage)}
+          backgroundImage={config.reservation.backgroundImage ? resolveImagePath(config.reservation.backgroundImage) : ''}
           ctaText={config.reservation.ctaText}
           contactEmail={config.restaurant.reservationEmail}
         />

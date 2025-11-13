@@ -27,6 +27,9 @@ export default function Navbar() {
   const handleNavigation = (sectionId: string) => {
     if (sectionId === 'order') {
       router.push('/order');
+    } else if (sectionId === 'menu') {
+      // Navigate to print-menu section when Menu is clicked
+      scrollToSection('print-menu');
     } else {
       scrollToSection(sectionId);
     }

@@ -154,7 +154,7 @@ export default function DetailsSection({ title, schedule, scheduleDays, location
               
               {address && (
                   <div className="flex items-start gap-4 pt-3 border-t border-card-border">
-                  <div className="text-primary mt-1">
+                  <div className="text-black mt-1">
                       <Navigation className="w-4 h-4" />
                   </div>
                     <div className="flex-1">
@@ -181,7 +181,7 @@ export default function DetailsSection({ title, schedule, scheduleDays, location
 
             {/* Google Maps Embed */}
             {googleMapsEmbed && (
-              <div className="rounded-lg overflow-hidden shadow-lg border border-card-border">
+              <div className="hidden md:block rounded-lg overflow-hidden shadow-lg border border-card-border">
                 <iframe
                   src={googleMapsEmbed}
                   width="100%"

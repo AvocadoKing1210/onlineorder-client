@@ -1,7 +1,7 @@
 {
   "restaurant": {
     "name": "Éphémère",
-    "tagline": "A limited culinary experience",
+    "tagline": "Fine dining reimagined",
     "email": "hello@ephemere.com",
     "reservationEmail": "reservations@ephemere.com",
     "phone": "",
@@ -20,25 +20,25 @@
     "locale": "en_US"
   },
   "seo": {
-    "title": "Éphémère - A Limited Culinary Experience",
-    "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting. Limited engagement only. Located in the Historic Warehouse District.",
-    "keywords": ["restaurant", "fine dining", "pop-up restaurant", "culinary experience", "Éphémère", "reservations", "Historic Warehouse District", "fine dining restaurant"],
+    "title": "Éphémère - Fine Dining Restaurant",
+    "description": "Experience fine dining excellence featuring innovative cuisine in an intimate setting. Located in Ottawa, ON.",
+    "keywords": ["restaurant", "fine dining", "culinary experience", "Éphémère", "reservations", "Ottawa", "fine dining restaurant"],
     "author": "Éphémère",
     "geo": {
-      "region": "US",
-      "placename": "Historic Warehouse District",
-      "latitude": "40.7589",
-      "longitude": "-73.9851"
+      "region": "CA",
+      "placename": "Ottawa, ON",
+      "latitude": "45.340053",
+      "longitude": "-75.709865"
     },
     "openGraph": {
-      "title": "Éphémère - A Limited Culinary Experience",
-      "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting.",
+      "title": "Éphémère - Fine Dining Restaurant",
+      "description": "Experience fine dining excellence featuring innovative cuisine in an intimate setting.",
       "type": "website",
       "siteName": "Éphémère"
     },
     "twitter": {
       "card": "summary_large_image",
-      "title": "Éphémère - A Limited Culinary Experience",
+      "title": "Éphémère - Fine Dining Restaurant",
       "description": "Join us for an exclusive pop-up dining experience featuring innovative cuisine in an intimate setting."
     },
     "structuredData": {
@@ -55,7 +55,7 @@
       },
       {
         "label": "About",
-        "sectionId": "about"
+        "sectionId": "concept"
       },
       {
         "label": "Order",
@@ -65,84 +65,165 @@
   },
   "hero": {
     "title": "Éphémère",
-    "tagline": "An intimate culinary journey through seasonal flavors",
-    "dates": "December 15–31, 2025",
-    "location": "The Historic Warehouse District",
+    "tagline": "Fine dining excellence in the heart of Ottawa",
+    "dates": "",
+    "location": "Ottawa, ON",
     "backgroundImage": "@assets/stock_images/elegant_restaurant_i_85ea31a6.jpg",
     "backgroundVideo": "@assets/video/3768941-hd_1920_1080_25fps.mp4",
     "ctaText": "Explore"
   },
   "concept": {
-    "statement": "For three weeks only, we invite you to experience a dining event where innovation meets tradition. Each dish tells a story of local ingredients, artisanal craftsmanship, and culinary passion."
+    "statement": "Welcome to Éphémère. We celebrate fine ingredients prepared with precision and passion. Each dish blends innovative techniques with time-honored traditions, honoring local flavors and global inspiration. Join us for refined cuisine in an elegant, intimate setting."
   },
   "menu": {
     "title": "Signature Dishes",
     "dishes": [
       {
-        "name": "Roasted Monkfish",
-        "description": "Pan-seared monkfish with saffron beurre blanc, heirloom tomatoes, and micro herbs",
-        "price": "$42",
-        "image": "@assets/stock_images/fine_dining_plating__d1e489c1.jpg"
-      },
-      {
-        "name": "Heritage Pork Tenderloin",
-        "description": "Sous-vide pork with apple mostarda, crispy pancetta, and wild mushroom reduction",
+        "name": "Pan-Seared Salmon",
+        "description": "Atlantic salmon pan-seared to perfection with a crispy skin, served with lemon butter sauce, roasted asparagus, and herbed rice pilaf",
         "price": "$38",
-        "image": "@assets/stock_images/fine_dining_plating__bbc0a5dc.jpg"
+        "image": "/unsplash/pan_seared_salmon.jpg"
       },
       {
-        "name": "Seasonal Tasting",
-        "description": "Chef's selection of three seasonal preparations highlighting local ingredients",
-        "price": "$58",
-        "image": "@assets/stock_images/fine_dining_plating__21ea3959.jpg"
+        "name": "Grilled Pork Chop",
+        "description": "Thick-cut bone-in pork chop grilled to perfection, served with apple chutney, roasted sweet potatoes, and sautéed green beans",
+        "price": "$36",
+        "image": "/unsplash/grilled_pork_chop.jpg"
       },
       {
         "name": "Duck Confit",
-        "description": "Slow-cooked duck leg with cherry gastrique, roasted root vegetables, and thyme",
+        "description": "Slow-cooked duck leg with cherry gastrique, roasted root vegetables, and thyme. Crispy skin with tender, fall-off-the-bone meat",
         "price": "$45",
-        "image": "@assets/stock_images/fine_dining_plating__48222664.jpg"
+        "image": "/unsplash/duck_confit.jpg"
       },
       {
-        "name": "Lobster Risotto",
-        "description": "Creamy arborio rice with butter-poached lobster, pea tendrils, and lemon zest",
-        "price": "$52",
-        "image": "@assets/stock_images/fine_dining_plating__7d06f067.jpg"
+        "name": "Mushroom Risotto",
+        "description": "Creamy arborio rice with wild mushrooms, white wine, and fresh herbs. Finished with Parmigiano-Reggiano, truffle oil, and microgreens",
+        "price": "$32",
+        "image": "/unsplash/mushroom_risotto.jpg"
       },
       {
         "name": "Wagyu Beef",
-        "description": "Grilled A5 wagyu with truffle pommes purée, asparagus, and red wine jus",
+        "description": "Grilled A5 wagyu with truffle pommes purée, asparagus, and red wine jus. Served with roasted bone marrow and seasonal vegetables",
         "price": "$68",
-        "image": "@assets/stock_images/fine_dining_plating__a76cbce9.jpg"
+        "image": "/unsplash/wagyu_beef.jpg"
+      },
+      {
+        "name": "Rack of Lamb",
+        "description": "Herb-crusted rack of lamb with mint pesto, roasted garlic, and a red wine reduction. Served with ratatouille and creamy polenta",
+        "price": "$48",
+        "image": "/unsplash/rack_of_lamb.jpg"
       }
     ]
   },
   "printableMenu": {
     "title": "Take-Home Menu",
     "subtitle": "Save or print our curated selection for your records",
-    "items": [
+    "categories": [
       {
-        "name": "Roasted Monkfish",
-        "description": "Pan-seared with saffron beurre blanc, heirloom tomatoes",
-        "price": "$42",
-        "image": "@assets/stock_images/fine_dining_plating__d1e489c1.jpg"
+        "name": "Appetizers",
+        "items": [
+          {
+            "name": "Shrimp Cocktail",
+            "description": "Chilled jumbo shrimp with house-made cocktail sauce",
+            "price": "$24",
+            "image": "/unsplash/shrimp_cocktail.jpg"
+          },
+          {
+            "name": "Crab Cakes",
+            "description": "Jumbo lump crab cakes with remoulade sauce and lemon aioli",
+            "price": "$28",
+            "image": "/unsplash/crab_cakes.jpg"
+          },
+          {
+            "name": "Burrata & Heirloom Tomatoes",
+            "description": "Creamy burrata with heirloom tomatoes, basil oil, and balsamic",
+            "price": "$18",
+            "image": "/unsplash/burrata_heirloom_tomatoes.jpg"
+          }
+        ]
       },
       {
-        "name": "Heritage Pork Tenderloin",
-        "description": "Sous-vide pork with apple mostarda, wild mushroom",
+        "name": "Entrée",
+        "items": [
+          {
+            "name": "Pan-Seared Salmon",
+            "description": "Atlantic salmon with lemon butter sauce, roasted asparagus",
         "price": "$38",
-        "image": "@assets/stock_images/fine_dining_plating__bbc0a5dc.jpg"
+            "image": "/unsplash/pan_seared_salmon.jpg"
+          },
+          {
+            "name": "Grilled Pork Chop",
+            "description": "Bone-in pork chop with apple chutney, roasted sweet potatoes",
+            "price": "$36",
+            "image": "/unsplash/grilled_pork_chop.jpg"
+          },
+          {
+            "name": "Duck Confit",
+            "description": "Slow-cooked duck leg with cherry gastrique, roasted vegetables",
+            "price": "$45",
+            "image": "/unsplash/duck_confit.jpg"
       },
       {
-        "name": "Seasonal Tasting",
-        "description": "Chef's selection of three seasonal preparations",
-        "price": "$58",
-        "image": "@assets/stock_images/fine_dining_plating__21ea3959.jpg"
+            "name": "Wagyu Beef",
+            "description": "Grilled A5 wagyu with truffle pommes purée, asparagus",
+            "price": "$68",
+            "image": "/unsplash/wagyu_beef.jpg"
+          },
+          {
+            "name": "Mushroom Risotto",
+            "description": "Creamy arborio rice with wild mushrooms, white wine, and fresh herbs",
+            "price": "$32",
+            "image": "/unsplash/mushroom_risotto.jpg"
+          },
+          {
+            "name": "Rack of Lamb",
+            "description": "Herb-crusted rack of lamb with mint pesto, roasted garlic",
+            "price": "$48",
+            "image": "/unsplash/rack_of_lamb.jpg"
+          },
+          {
+            "name": "Grilled Sea Bass",
+            "description": "Fresh sea bass fillet grilled to perfection with lemon butter sauce, served with roasted vegetables and herbed quinoa",
+            "price": "$40",
+            "image": "/unsplash/grilled_sea_bass.jpg"
+          },
+          {
+            "name": "Shrimp Scampi",
+            "description": "Pan-seared jumbo shrimp with linguine pasta, cherry tomatoes, garlic, white wine, and lemon butter sauce",
+            "price": "$34",
+            "image": "/unsplash/shrimp_scampi.jpg"
+          }
+        ]
       },
       {
-        "name": "Duck Confit",
-        "description": "Slow-cooked with cherry gastrique, roasted vegetables",
-        "price": "$45",
-        "image": "@assets/stock_images/fine_dining_plating__48222664.jpg"
+        "name": "Desserts",
+        "items": [
+          {
+            "name": "Chocolate Soufflé",
+            "description": "Warm dark chocolate soufflé with vanilla bean ice cream",
+            "price": "$18",
+            "image": "/unsplash/chocolate_soufflé.webp"
+      },
+      {
+            "name": "Crème Brûlée",
+            "description": "Classic vanilla bean crème brûlée with fresh berries",
+            "price": "$14",
+            "image": "/unsplash/crème_brûlée.jpg"
+          },
+          {
+            "name": "Lemon Tart",
+            "description": "Meyer lemon curd tart with meringue and berry coulis",
+            "price": "$16",
+            "image": "/unsplash/lemon_tart.jpg"
+          },
+          {
+            "name": "Tiramisu",
+            "description": "House-made tiramisu with espresso and cocoa",
+            "price": "$15",
+            "image": "/unsplash/tiramisu.jpg"
+          }
+        ]
       }
     ]
   },
@@ -151,52 +232,52 @@
     "schedule": {
       "days": [
         {
-          "day": "Saturday",
-          "hours": "11:30 a.m. – 9:00 p.m."
-        },
-        {
-          "day": "Sunday",
-          "hours": "11:30 a.m. – 8:45 p.m."
-        },
-        {
           "day": "Monday",
-          "hours": "11:30 a.m. – 8:45 p.m."
+          "hours": "5:00 p.m. – 10:00 p.m."
         },
         {
           "day": "Tuesday",
-          "hours": "11:30 a.m. – 8:45 p.m."
+          "hours": "5:00 p.m. – 10:00 p.m."
         },
         {
           "day": "Wednesday",
-          "hours": "11:30 a.m. – 8:45 p.m."
+          "hours": "5:00 p.m. – 10:00 p.m."
         },
         {
           "day": "Thursday",
-          "hours": "11:30 a.m. – 8:45 p.m."
+          "hours": "5:00 p.m. – 10:00 p.m."
         },
         {
           "day": "Friday",
-          "hours": "11:30 a.m. – 9:00 p.m."
+          "hours": "5:00 p.m. – 11:00 p.m."
+        },
+        {
+          "day": "Saturday",
+          "hours": "5:00 p.m. – 11:00 p.m."
+        },
+        {
+          "day": "Sunday",
+          "hours": "5:00 p.m. – 9:00 p.m."
         }
       ]
     },
     "location": {
-      "address": "1847 Warehouse Lane, Historic District, Suite 200",
-      "city": "Historic District",
-      "state": "",
-      "country": "US",
-      "googleMapsLink": "https://www.google.com/maps/search/?api=1&query=1847+Warehouse+Lane+Historic+District+Suite+200",
-      "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.184133194902!2d-73.98811768459398!3d40.75889597932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ1JzMyLjAiTiA3M8KwNTknMTkuMiJX!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+      "address": "Hunt Club Rd",
+      "city": "Ottawa",
+      "state": "ON",
+      "country": "CA",
+      "googleMapsLink": "https://www.google.com/maps/search/?api=1&query=Hunt+Club+Rd+Ottawa+ON",
+      "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2800.5!2d-75.709865!3d45.340053!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cce07d9cc918f57%3A0x6c51997ac513a7df!2sHunt%20Club%20Rd%2C%20Ottawa%2C%20ON!5e0!3m2!1sen!2sca!4v1234567890123!5m2!1sen!2sca"
     }
   },
   "reservation": {
-    "title": "Reserve Your Experience",
-    "description": "Seating is extremely limited for this exclusive engagement. Secure your table today and join us for an unforgettable evening.",
+    "title": "Reserve Your Table",
+    "description": "Join us for an unforgettable dining experience. Secure your reservation today.",
     "ctaText": "Reserve Now",
-    "backgroundImage": "@assets/stock_images/restaurant_ambiance__973c1831.jpg"
+    "backgroundImage": ""
   },
   "footer": {
-    "engagementDates": "December 15–31, 2025",
+    "engagementDates": "",
     "copyrightYear": "2025"
   }
 }

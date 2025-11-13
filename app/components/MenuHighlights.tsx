@@ -232,7 +232,7 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                     onClick={() => scrollToIndex(index)}
                     className={`transition-all duration-300 rounded-full ${
                       activeIndex === index
-                        ? 'w-8 h-2 bg-primary'
+                        ? 'w-8 h-2 bg-black'
                         : 'w-2 h-2 bg-foreground/30 hover:bg-foreground/40'
                     }`}
                     aria-label={`Go to dish ${index + 1}`}
