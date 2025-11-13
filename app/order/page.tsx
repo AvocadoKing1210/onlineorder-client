@@ -29,8 +29,16 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { Plus, Minus, ShoppingCart, X, AlertCircle } from 'lucide-react'
+import { Plus, Minus, ShoppingCart, X, AlertCircle, Search, SlidersHorizontal } from 'lucide-react'
 import { MenuCategorySection } from '@/components/menu/MenuCategorySection'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { MenuItemDialog } from '@/components/menu/MenuItemDialog'
 import {
   getMenuCategories,
@@ -119,6 +127,9 @@ export default function OrderPage() {
   const [isCartLoaded, setIsCartLoaded] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCheckoutDialogOpen, setIsCheckoutDialogOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const { toast } = useToast()
 
   // Load cart from localStorage on mount
@@ -167,10 +178,32 @@ export default function OrderPage() {
     queryFn: () => getMenuItems(),
   })
 
-  // Group items by category - memoized for performance
+  // Filter menu items based on search query and category - memoized for performance
+  const filteredMenuItems = useMemo(() => {
+    let filtered = menuItems
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter((item) => item.category_id === selectedCategory)
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter((item) => {
+        const nameMatch = item.name.toLowerCase().includes(query)
+        const descriptionMatch = item.description?.toLowerCase().includes(query) || false
+        return nameMatch || descriptionMatch
+      })
+    }
+
+    return filtered
+  }, [menuItems, selectedCategory, searchQuery])
+
+  // Group filtered items by category - memoized for performance
   const itemsByCategory = useMemo(() => {
     const grouped: Record<string, MenuItemWithCategory[]> = {}
-    menuItems.forEach((item) => {
+    filteredMenuItems.forEach((item) => {
       const categoryId = item.category_id
       if (!grouped[categoryId]) {
         grouped[categoryId] = []
@@ -178,7 +211,7 @@ export default function OrderPage() {
       grouped[categoryId].push(item)
     })
     return grouped
-  }, [menuItems])
+  }, [filteredMenuItems])
 
   // Calculate total price
   const getTotalPrice = () => {
@@ -697,19 +730,49 @@ export default function OrderPage() {
       {/* Main Content */}
       <div className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Search and Filter Bar */}
           <div className="mb-6 md:mb-8">
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl mb-2 text-foreground">
-                Order Online
-              </h1>
-              <p className="text-base sm:text-lg text-muted-foreground">
-                Select items from our menu to add to your order
-              </p>
+            <div className="flex gap-2 sm:gap-4">
+              {/* Search Input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search menu items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-11 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+              {/* Mobile: Icon-only filter button */}
+              {isMobile && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-11 w-11 flex-shrink-0 focus:ring-0 focus:ring-offset-0"
+                  onClick={() => setIsFilterSheetOpen(true)}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+              )}
+              {/* Desktop: Category Filter Dropdown */}
+              {!isMobile && (
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-[200px] h-11 focus:ring-0 focus:ring-offset-0">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
-
-          <Separator className="mb-8" />
 
           {/* Menu Content */}
           {isLoading ? (
@@ -732,6 +795,23 @@ export default function OrderPage() {
                 No menu items available at this time
             </p>
           </div>
+          ) : filteredMenuItems.length === 0 ? (
+            <div className="text-center py-16">
+              <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground text-base sm:text-lg mb-2">
+                No items found matching your search
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery('')
+                  setSelectedCategory('all')
+                }}
+                className="mt-4"
+              >
+                Clear filters
+              </Button>
+            </div>
           ) : (
             <div className="space-y-12 sm:space-y-16">
               {categories.map((category) => {
@@ -767,6 +847,61 @@ export default function OrderPage() {
         onSubmit={handleCheckoutSubmit}
         isSubmitting={isSubmitting}
       />
+
+      {/* Mobile Filter Drawer */}
+      {isMobile && (
+        <Drawer open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+          <DrawerContent className="max-h-[96vh] flex flex-col">
+            <DrawerHeader className="text-left">
+              <DrawerTitle className="font-display text-xl sm:text-2xl">
+                Filter by Category
+              </DrawerTitle>
+              <DrawerDescription>
+                Select a category to filter menu items
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4">
+              <Card
+                className={`border-card-border cursor-pointer transition-colors ${
+                  selectedCategory === 'all'
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'hover:shadow-md'
+                }`}
+                onClick={() => {
+                  setSelectedCategory('all')
+                  setIsFilterSheetOpen(false)
+                }}
+              >
+                <CardContent className="p-4">
+                  <p className="font-semibold text-sm sm:text-base">
+                    All Categories
+                  </p>
+                </CardContent>
+              </Card>
+              {categories.map((category) => (
+                <Card
+                  key={category.id}
+                  className={`border-card-border cursor-pointer transition-colors ${
+                    selectedCategory === category.id
+                      ? 'bg-foreground text-background border-foreground'
+                      : 'hover:shadow-md'
+                  }`}
+                  onClick={() => {
+                    setSelectedCategory(category.id)
+                    setIsFilterSheetOpen(false)
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <p className="font-semibold text-sm sm:text-base">
+                      {category.name}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
   )
 }
