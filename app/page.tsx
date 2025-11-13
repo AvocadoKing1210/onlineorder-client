@@ -13,6 +13,7 @@ import PrintableMenu from "@/components/PrintableMenu";
 import ReservationCTA from "@/components/ReservationCTA";
 import Footer from "@/components/Footer";
 import { config, resolveImagePath, resolveVideoPath, getFullAddress } from "@/lib/config";
+import { NotificationBanner } from "@/components/NotificationBanner";
 
 export default function Home() {
   const pathname = usePathname()
@@ -162,6 +163,7 @@ export default function Home() {
   return (
     <div ref={containerRef} className="min-h-screen">
       <Navbar />
+      <NotificationBanner />
       <ScrollIndicator sections={sections} />
       
       <div id="hero" className="relative overflow-hidden snap-start" style={{ scrollSnapAlign: 'start', scrollSnapStop: 'always' }}>

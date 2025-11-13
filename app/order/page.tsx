@@ -55,6 +55,7 @@ import { useToast } from '@/hooks/use-toast'
 import { CheckoutDialog } from '@/components/checkout/CheckoutDialog'
 import type { CheckoutFormData } from '@/components/checkout/CheckoutForm'
 import { saveProfileFromCheckout } from '@/lib/api/profile'
+import { NotificationBanner } from '@/components/NotificationBanner'
 
 // Cart Types with Modifiers Support
 interface CartItemModifier {
@@ -467,6 +468,7 @@ export default function OrderPage() {
         onCartClick={() => setIsCartOpen(true)}
         cartItemCount={getTotalItems()}
       />
+      <NotificationBanner />
       
       {/* Cart Content Component */}
       {(() => {
@@ -728,7 +730,12 @@ export default function OrderPage() {
       })()}
 
       {/* Main Content */}
-      <div className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
+      <div 
+        className="pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8"
+        style={{ 
+          paddingTop: `calc(5rem + var(--notification-banner-height, 0px))`,
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Search and Filter Bar */}
           <div className="mb-6 md:mb-8">
