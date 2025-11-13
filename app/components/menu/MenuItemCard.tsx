@@ -67,7 +67,7 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
           )}
           
           {/* Content */}
-          <div className="flex-1 p-2.5 sm:p-3 flex flex-col min-h-0 h-28 sm:h-36">
+          <div className="flex-1 px-2.5 sm:px-3 pt-2.5 sm:pt-3 pb-1.5 sm:pb-2 flex flex-col min-h-0 h-28 sm:h-36">
             <div className="flex-1 min-h-0">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <h3 className="font-semibold text-sm sm:text-base text-foreground leading-tight">
@@ -108,7 +108,7 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
             </div>
             
             {/* Price and Add Button Row */}
-            <div className="flex items-center justify-between gap-2 mt-auto pt-1">
+            <div className="flex items-center justify-between gap-2 mt-auto">
               <span className="font-geist text-base sm:text-lg text-foreground whitespace-nowrap">
                 ${price.toFixed(2)}
               </span>

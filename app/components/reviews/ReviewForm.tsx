@@ -111,7 +111,7 @@ export function ReviewForm({
         <Button
           type="submit"
           disabled={rating < 1 || rating > 5 || isSubmitting}
-          className="min-w-[120px]"
+          className="min-w-[120px] bg-black text-white hover:bg-black/90 border-transparent"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Review'}
         </Button>

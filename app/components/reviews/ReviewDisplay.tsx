@@ -38,18 +38,14 @@ export function ReviewDisplay({ review, showUser = false }: ReviewDisplayProps) 
 
         {/* Content */}
         <div className="flex-1 min-w-0 space-y-2">
-          {/* User Name and Date */}
+          {/* User Name, Rating, and Date */}
           <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">
               {displayName || 'Anonymous'}
             </span>
-            <span className="text-xs text-muted-foreground flex-shrink-0">
-              {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
-            </span>
-          </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1">
+              {/* Rating Stars */}
+              <div className="flex items-center gap-0.5">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
@@ -61,8 +57,10 @@ export function ReviewDisplay({ review, showUser = false }: ReviewDisplayProps) 
                 )}
               />
             ))}
-            <span className="ml-1 text-xs font-medium text-muted-foreground">
-              {review.rating}
+              </div>
+            </div>
+            <span className="text-xs text-muted-foreground flex-shrink-0">
+              {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
             </span>
           </div>
 

@@ -101,70 +101,72 @@ export function MenuItemReviews({
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1.5">
-            <MessageSquare className="h-5 w-5 text-muted-foreground" />
-            <h3 className="font-semibold text-lg">Reviews</h3>
-          </div>
-          {/* Rating Summary - below Reviews title, smaller */}
-          {ratingLoading ? (
-            <Skeleton className="h-4 w-32" />
-          ) : ratingData ? (
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => {
-                  const fullStars = Math.floor(ratingData.average)
-                  const hasHalfStar = ratingData.average % 1 >= 0.5
-                  if (star <= fullStars) {
-                    return (
-                      <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    )
-                  } else if (star === fullStars + 1 && hasHalfStar) {
-                    return (
-                      <div key={star} className="relative h-3 w-3">
-                        <Star className="h-3 w-3 fill-gray-200 text-gray-300" />
-                        <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        </div>
-                      </div>
-                    )
-                  } else {
-                    return (
-                      <Star key={star} className="h-3 w-3 fill-gray-200 text-gray-300" />
-                    )
-                  }
-                })}
-              </div>
-              <span className="text-xs font-semibold">{ratingData.average.toFixed(1)}</span>
-              <Badge variant="secondary" className="text-xs h-3.5 px-1.5 rounded-full">
-                {ratingData.count} {ratingData.count === 1 ? 'review' : 'reviews'}
-              </Badge>
+      {/* Sticky header with button */}
+      <div className="sticky top-0 z-10 bg-background pb-2 -mx-4 px-4 pt-2 -mt-2">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1.5">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <h3 className="font-semibold text-lg">Reviews</h3>
             </div>
-          ) : null}
+            {/* Rating Summary - below Reviews title, smaller */}
+            {ratingLoading ? (
+              <Skeleton className="h-4 w-32" />
+            ) : ratingData ? (
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const fullStars = Math.floor(ratingData.average)
+                    const hasHalfStar = ratingData.average % 1 >= 0.5
+                    if (star <= fullStars) {
+                      return (
+                        <Star key={star} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      )
+                    } else if (star === fullStars + 1 && hasHalfStar) {
+                      return (
+                        <div key={star} className="relative h-3 w-3">
+                          <Star className="h-3 w-3 fill-gray-200 text-gray-300" />
+                          <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          </div>
+                        </div>
+                      )
+                    } else {
+                      return (
+                        <Star key={star} className="h-3 w-3 fill-gray-200 text-gray-300" />
+                      )
+                    }
+                  })}
+                </div>
+                <span className="text-xs font-semibold">{ratingData.average.toFixed(1)}</span>
+                <Badge variant="secondary" className="text-xs h-3.5 px-1.5 rounded-full">
+                  {ratingData.count} {ratingData.count === 1 ? 'review' : 'reviews'}
+                </Badge>
+              </div>
+            ) : null}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenReviewDialog}
+            disabled={hasReviewed}
+            className="gap-2"
+          >
+            {hasReviewed ? (
+              <>
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                Reviewed
+              </>
+            ) : (
+              <>
+                <SquarePen className="h-4 w-4" />
+                Write Review
+              </>
+            )}
+          </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleOpenReviewDialog}
-          disabled={hasReviewed}
-          className="gap-2"
-        >
-          {hasReviewed ? (
-            <>
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              Reviewed
-            </>
-          ) : (
-            <>
-              <SquarePen className="h-4 w-4" />
-              Write Review
-            </>
-          )}
-        </Button>
+        <Separator className="mt-2" />
       </div>
-
-      <Separator />
 
       {/* Reviews List */}
       {reviewsLoading ? (
@@ -190,12 +192,14 @@ export function MenuItemReviews({
       {/* Auth Dialog */}
       <AuthDialog
         open={isAuthDialogOpen}
-        onOpenChange={setIsAuthDialogOpen}
-        onSuccess={async () => {
-          setIsAuthDialogOpen(false)
-          // Refresh authentication status
-          const user = await getUser()
-          setIsAuthenticated(!!user?.sub)
+        onOpenChange={(open) => {
+          setIsAuthDialogOpen(open)
+          if (!open) {
+            // Refresh authentication status when dialog closes
+            getUser().then((user) => {
+              setIsAuthenticated(!!user?.sub)
+            })
+          }
         }}
       />
     </div>
