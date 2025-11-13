@@ -41,18 +41,23 @@ export interface ReviewResponse {
 }
 
 /**
- * Get Cloudflare Worker URL from environment
+ * Get Next.js API route URL for review submission
+ * This proxies to Cloudflare Worker with server-side API key
  */
-function getCloudflareReviewUrl(): string {
-  const url = process.env.NEXT_PUBLIC_CLOUDFLARE_REVIEW_URL
-  if (!url) {
-    throw new Error('NEXT_PUBLIC_CLOUDFLARE_REVIEW_URL is not configured')
+function getReviewSubmitUrl(): string {
+  // Use Next.js API route instead of direct Cloudflare Worker
+  // The API route handles the API key server-side
+  if (typeof window !== 'undefined') {
+    // Client-side: use relative URL
+    return '/api/reviews/submit'
   }
-  return url
+  // Server-side: construct full URL
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  return `${baseUrl}/api/reviews/submit`
 }
 
 /**
- * Submit review via Cloudflare Worker
+ * Submit review via Next.js API route (which proxies to Cloudflare Worker)
  * 
  * @param request - Review submission request with menu_item_id, rating, and optional text
  * @returns Review response with review details
@@ -65,11 +70,11 @@ export async function submitReview(
     throw new Error('Authentication required. Please log in to submit a review.')
   }
 
-  const url = getCloudflareReviewUrl()
+  const url = getReviewSubmitUrl()
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${authToken}`,
+    'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
   }
 
   const response = await fetch(url, {

@@ -45,14 +45,19 @@ export interface OrderSubmissionResponse {
 }
 
 /**
- * Get Cloudflare Worker URL from environment
+ * Get Next.js API route URL for order submission
+ * This proxies to Cloudflare Worker with server-side API key
  */
-function getCloudflareOrderUrl(): string {
-  const url = process.env.NEXT_PUBLIC_CLOUDFLARE_ORDER_URL
-  if (!url) {
-    throw new Error('NEXT_PUBLIC_CLOUDFLARE_ORDER_URL is not configured')
+function getOrderSubmitUrl(): string {
+  // Use Next.js API route instead of direct Cloudflare Worker
+  // The API route handles the API key server-side
+  if (typeof window !== 'undefined') {
+    // Client-side: use relative URL
+    return '/api/orders/submit'
   }
-  return url
+  // Server-side: construct full URL
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  return `${baseUrl}/api/orders/submit`
 }
 
 /**
@@ -66,13 +71,14 @@ export async function submitOrder(
   request: OrderSubmissionRequest,
   authToken?: string
 ): Promise<OrderSubmissionResponse> {
-  const url = getCloudflareOrderUrl()
+  const url = getOrderSubmitUrl()
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
 
   // Add Auth0 token if provided (for authenticated users)
+  // This will be forwarded by the Next.js API route to Cloudflare Worker
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`
   }

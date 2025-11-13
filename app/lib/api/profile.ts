@@ -18,7 +18,7 @@ export interface UserProfile {
 }
 
 /**
- * Get user profile for authenticated user
+ * Get user profile for authenticated user via Next.js API route
  */
 export async function getUserProfile(): Promise<UserProfile | null> {
   const authToken = await getAuth0Token()
@@ -26,12 +26,12 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     return null
   }
 
-  const url = getCloudflareProfileUrl()
+  const url = getProfileApiUrl()
 
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${authToken}`,
+      'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
     },
   })
 
@@ -48,18 +48,23 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 }
 
 /**
- * Get Cloudflare Worker URL from environment
+ * Get Next.js API route URL for profile operations
+ * This proxies to Cloudflare Worker with server-side API key
  */
-function getCloudflareProfileUrl(): string {
-  const url = process.env.NEXT_PUBLIC_CLOUDFLARE_PROFILE_URL
-  if (!url) {
-    throw new Error('NEXT_PUBLIC_CLOUDFLARE_PROFILE_URL is not configured')
+function getProfileApiUrl(): string {
+  // Use Next.js API route instead of direct Cloudflare Worker
+  // The API route handles the API key server-side
+  if (typeof window !== 'undefined') {
+    // Client-side: use relative URL
+    return '/api/profile'
   }
-  return url
+  // Server-side: construct full URL
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  return `${baseUrl}/api/profile`
 }
 
 /**
- * Update user profile via Cloudflare Worker
+ * Update user profile via Next.js API route (which proxies to Cloudflare Worker)
  */
 export async function updateUserProfile(
   updates: Partial<Pick<UserProfile, 'display_name' | 'phone_number' | 'avatar_url' | 'preferred_locale'>>
@@ -74,13 +79,13 @@ export async function updateUserProfile(
     throw new Error('Failed to get authentication token')
   }
 
-  const url = getCloudflareProfileUrl()
+  const url = getProfileApiUrl()
 
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
     },
     body: JSON.stringify(updates),
   })
@@ -94,7 +99,7 @@ export async function updateUserProfile(
 }
 
 /**
- * Create or update user profile from checkout information via Cloudflare Worker
+ * Create or update user profile from checkout information via Next.js API route
  */
 export async function saveProfileFromCheckout(
   name: string,
@@ -111,13 +116,13 @@ export async function saveProfileFromCheckout(
     throw new Error('Failed to get authentication token')
   }
 
-  const url = getCloudflareProfileUrl()
+  const url = getProfileApiUrl()
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
+      'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
     },
     body: JSON.stringify({
         email: email,
