@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { X, Rss } from 'lucide-react'
+import { X, Info } from 'lucide-react'
 import { getActiveNotifications, type Notification } from '@/lib/api/notifications'
 import { Button } from '@/components/ui/button'
 import {
@@ -118,7 +118,7 @@ export function NotificationBanner() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Rss className="h-5 w-5 text-foreground/70" />
+              <Info className="h-5 w-5 text-foreground/70" />
               {selectedNotification?.title}
             </DialogTitle>
           </DialogHeader>
@@ -144,7 +144,7 @@ function NotificationBannerItem({ notification, onClick, onDismiss }: Notificati
     <div 
       className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0"
     >
-      <Rss className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/70 flex-shrink-0" />
+      <Info className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/70 flex-shrink-0" />
       <span 
         className="text-sm sm:text-base text-foreground truncate flex-1 cursor-pointer hover:underline"
         onClick={onClick}

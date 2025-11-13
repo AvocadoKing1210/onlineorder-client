@@ -818,7 +818,7 @@ export default function OrderPage() {
               >
                 Clear filters
               </Button>
-            </div>
+          </div>
           ) : (
             <div className="space-y-12 sm:space-y-16">
               {categories.map((category) => {
