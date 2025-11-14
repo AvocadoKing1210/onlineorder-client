@@ -27,6 +27,7 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
+  ArrowLeft,
   History,
   ShoppingBag,
   Copy,
@@ -412,6 +413,16 @@ export default function OrderHistoryPage() {
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
           <div>
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            </div>
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl mb-2 text-foreground">
               Order History
             </h1>
