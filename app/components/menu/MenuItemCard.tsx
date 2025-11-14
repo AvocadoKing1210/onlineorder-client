@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ interface MenuItemCardProps {
   onSelect: (item: MenuItemWithCategory) => void
 }
 
-export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
+function MenuItemCardComponent({ item, onSelect }: MenuItemCardProps) {
   const price = parseFloat(item.price)
   const imageUrl = parseImageUrl(item.image_url)
   const hasImage = isValidUrl(imageUrl)
@@ -74,6 +74,8 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
                 sizes="(max-width: 640px) 112px, 144px"
                 loading="lazy"
                 unoptimized={imageUrl?.startsWith('http')}
+                priority={false}
+                fetchPriority="auto"
               />
               {primaryTag && (
                 <Badge 
@@ -162,4 +164,22 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
     </Card>
   )
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export const MenuItemCard = memo(MenuItemCardComponent, (prevProps, nextProps) => {
+  // Custom comparison function for memo
+  // Return true if props are equal (no re-render needed)
+  // Return false if props differ (re-render needed)
+  const itemsEqual = 
+    prevProps.item.id === nextProps.item.id &&
+    prevProps.item.name === nextProps.item.name &&
+    prevProps.item.price === nextProps.item.price &&
+    prevProps.item.image_url === nextProps.item.image_url &&
+    prevProps.item.description === nextProps.item.description &&
+    JSON.stringify(prevProps.item.dietary_tags) === JSON.stringify(nextProps.item.dietary_tags)
+  
+  // If items are equal, check if onSelect callback changed
+  // Note: onSelect is usually stable, but we check anyway
+  return itemsEqual && prevProps.onSelect === nextProps.onSelect
+})
 
