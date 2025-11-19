@@ -15,9 +15,10 @@ import { cn } from '@/lib/utils'
 interface MenuItemCardProps {
   item: MenuItemWithCategory
   onSelect: (item: MenuItemWithCategory) => void
+  priority?: boolean
 }
 
-function MenuItemCardComponent({ item, onSelect }: MenuItemCardProps) {
+function MenuItemCardComponent({ item, onSelect, priority = false }: MenuItemCardProps) {
   const price = parseFloat(item.price)
   const imageUrl = parseImageUrl(item.image_url)
   const hasImage = isValidUrl(imageUrl)
@@ -72,10 +73,10 @@ function MenuItemCardComponent({ item, onSelect }: MenuItemCardProps) {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 112px, 144px"
-                loading="lazy"
+                loading={priority ? "eager" : "lazy"}
                 unoptimized={imageUrl?.startsWith('http')}
-                priority={false}
-                fetchPriority="auto"
+                priority={priority}
+                fetchPriority={priority ? "high" : "auto"}
               />
               {primaryTag && (
                 <Badge 
@@ -176,7 +177,8 @@ export const MenuItemCard = memo(MenuItemCardComponent, (prevProps, nextProps) =
     prevProps.item.price === nextProps.item.price &&
     prevProps.item.image_url === nextProps.item.image_url &&
     prevProps.item.description === nextProps.item.description &&
-    JSON.stringify(prevProps.item.dietary_tags) === JSON.stringify(nextProps.item.dietary_tags)
+    JSON.stringify(prevProps.item.dietary_tags) === JSON.stringify(nextProps.item.dietary_tags) &&
+    prevProps.priority === nextProps.priority
   
   // If items are equal, check if onSelect callback changed
   // Note: onSelect is usually stable, but we check anyway

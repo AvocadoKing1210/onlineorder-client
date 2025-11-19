@@ -8,12 +8,14 @@ interface MenuCategorySectionProps {
   category: MenuCategory
   items: MenuItemWithCategory[]
   onItemSelect: (item: MenuItemWithCategory) => void
+  priority?: boolean
 }
 
 export function MenuCategorySection({
   category,
   items,
   onItemSelect,
+  priority = false,
 }: MenuCategorySectionProps) {
   if (items.length === 0) {
     return null
@@ -29,15 +31,15 @@ export function MenuCategorySection({
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {items.map((item) => (
+        {items.map((item, index) => (
             <MenuItemCard
               key={item.id}
               item={item}
               onSelect={onItemSelect}
+              priority={priority && index < 6}
             />
         ))}
       </div>
     </section>
   )
 }
-

@@ -195,8 +195,8 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        priority={index === 0}
-                        loading={index === 0 ? undefined : "lazy"}
+                        priority={true}
+                        loading="eager"
                         data-testid={`img-dish-${index}`}
                       />
                     </div>

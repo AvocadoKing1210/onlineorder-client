@@ -99,7 +99,8 @@ export default function PrintableMenu({ title, subtitle, categories }: Printable
                           fill
                           className="object-cover"
                           sizes="(max-width: 640px) 256px, (max-width: 768px) 288px, 320px"
-                          loading="lazy"
+                          loading={index < 4 ? "eager" : "lazy"}
+                          priority={index < 4}
                           unoptimized={typeof item.image === 'string' ? item.image.startsWith('/') : false}
                 />
               </div>
