@@ -1,5 +1,7 @@
+import Image from 'next/image'
+
 interface GalleryImage {
-  src: string;
+  src: string | { src: string };
   alt: string;
   large?: boolean;
 }
@@ -30,10 +32,12 @@ export default function AmbianceGallery({ title, images }: AmbianceGalleryProps)
               data-testid={`gallery-image-${index}`}
               onClick={() => console.log(`Gallery image clicked: ${image.alt}`)}
             >
-              <img
-                src={image.src}
+              <Image
+                src={typeof image.src === 'string' ? image.src : image.src.src}
                 alt={image.alt}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes={image.large ? "(max-width: 768px) 100vw, 100vw" : "(max-width: 768px) 100vw, 50vw"}
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
             </div>

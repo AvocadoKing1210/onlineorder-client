@@ -245,13 +245,13 @@ export function CheckoutForm({ onSubmit, isSubmitting = false }: CheckoutFormPro
                             <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>We'll use this to contact you about your order</p>
+                            <p>We&apos;ll use this to contact you about your order</p>
                           </TooltipContent>
                         </Tooltip>
                       )}
                       {isMobile && (
                         <span className="text-xs text-muted-foreground">
-                          We'll use this to contact you about your order
+                          We&apos;ll use this to contact you about your order
                         </span>
                       )}
                     </div>
@@ -288,14 +288,14 @@ export function CheckoutForm({ onSubmit, isSubmitting = false }: CheckoutFormPro
                                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>We'll remember your information for future orders</p>
+                                <p>We&apos;ll remember your information for future orders</p>
                               </TooltipContent>
                             </Tooltip>
                           )}
                         </div>
                         {isMobile && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            We'll remember your information for future orders
+                            We&apos;ll remember your information for future orders
                           </p>
                         )}
                       </div>

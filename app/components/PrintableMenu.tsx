@@ -9,7 +9,7 @@ interface MenuItem {
   name: string;
   description: string;
   price: string;
-  image: string;
+  image: string | { src: string };
 }
 
 interface MenuCategory {
@@ -93,13 +93,13 @@ export default function PrintableMenu({ title, subtitle, categories }: Printable
             >
                       <div className="w-full h-48 flex-shrink-0 rounded-md overflow-hidden bg-muted relative">
                         <Image
-                  src={item.image}
+                  src={typeof item.image === 'string' ? item.image : item.image.src}
                   alt={item.name}
                           fill
                           className="object-cover"
                           sizes="320px"
                           loading="lazy"
-                          unoptimized={item.image.startsWith('/')}
+                          unoptimized={typeof item.image === 'string' ? item.image.startsWith('/') : false}
                 />
               </div>
                       <div className="flex flex-col flex-1 min-h-0">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Menu, X, User, ShoppingCart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { config } from '@/lib/config'
@@ -112,11 +113,16 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 className="h-9 w-9 rounded-full hover:bg-muted/50"
               >
                 {user.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'Account'}
-                    className="h-6 w-6 rounded-full"
-                  />
+                  <div className="relative h-6 w-6 rounded-full overflow-hidden">
+                    <Image
+                      src={user.picture}
+                      alt={user.name || 'Account'}
+                      fill
+                      className="object-cover"
+                      sizes="24px"
+                      unoptimized
+                    />
+                  </div>
                 ) : (
                   <User className="h-5 w-5" />
                 )}
@@ -169,11 +175,16 @@ export default function OrderNavbar({ onCartClick, cartItemCount = 0 }: OrderNav
                 className="h-9 w-9 rounded-full hover:bg-muted/50"
               >
                 {user.picture ? (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'Account'}
-                    className="h-6 w-6 rounded-full"
-                  />
+                  <div className="relative h-6 w-6 rounded-full overflow-hidden">
+                    <Image
+                      src={user.picture}
+                      alt={user.name || 'Account'}
+                      fill
+                      className="object-cover"
+                      sizes="24px"
+                      unoptimized
+                    />
+                  </div>
                 ) : (
                   <User className="h-5 w-5" />
                 )}

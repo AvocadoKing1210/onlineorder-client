@@ -164,14 +164,19 @@ export async function getOrderByReference(referenceNumber: string): Promise<Orde
   }
 
   // Fetch order items
+  const orderId = (order as any).id
+  if (!orderId) {
+    return null
+  }
+
   const { data: items, error: itemsError } = await supabase
     .from('order_item')
     .select('*')
-    .eq('order_id', order.id)
+    .eq('order_id', orderId)
     .order('created_at', { ascending: true })
 
   return {
-    ...order,
+    ...(order as any),
     items: items || [],
   } as OrderDetails
 }
@@ -210,7 +215,7 @@ export async function getUserOrders(): Promise<OrderDetails[]> {
   }
 
   // Fetch items for all orders
-  const orderIds = orders.map(o => o.id)
+  const orderIds = (orders as any[]).map((o: any) => o.id).filter((id: any) => id)
   const { data: items } = await supabase
     .from('order_item')
     .select('*')
@@ -219,14 +224,14 @@ export async function getUserOrders(): Promise<OrderDetails[]> {
 
   // Group items by order_id
   const itemsByOrderId = new Map<string, OrderItem[]>()
-  items?.forEach(item => {
+  items?.forEach((item: any) => {
     const orderItems = itemsByOrderId.get(item.order_id) || []
     orderItems.push(item as OrderItem)
     itemsByOrderId.set(item.order_id, orderItems)
   })
 
   // Attach items to orders
-  return orders.map(order => ({
+  return (orders as any[]).map((order: any) => ({
     ...order,
     items: itemsByOrderId.get(order.id) || [],
   })) as OrderDetails[]
@@ -292,7 +297,7 @@ export async function getGuestOrders(referenceNumbers: string[]): Promise<OrderD
   }
 
   // Fetch items for all orders
-  const orderIds = orders.map(o => o.id)
+  const orderIds = (orders as any[]).map((o: any) => o.id).filter((id: any) => id)
   const { data: items } = await supabase
     .from('order_item')
     .select('*')
@@ -301,14 +306,14 @@ export async function getGuestOrders(referenceNumbers: string[]): Promise<OrderD
 
   // Group items by order_id
   const itemsByOrderId = new Map<string, OrderItem[]>()
-  items?.forEach(item => {
+  items?.forEach((item: any) => {
     const orderItems = itemsByOrderId.get(item.order_id) || []
     orderItems.push(item as OrderItem)
     itemsByOrderId.set(item.order_id, orderItems)
   })
 
   // Attach items to orders
-  return orders.map(order => ({
+  return (orders as any[]).map((order: any) => ({
     ...order,
     items: itemsByOrderId.get(order.id) || [],
   })) as OrderDetails[]

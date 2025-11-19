@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 
 interface Dish {
   name: string;
   description: string;
   price: string;
-  image: string;
+  image: string | { src: string };
 }
 
 interface MenuHighlightsProps {
@@ -24,7 +24,7 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
   const activeIndexRef = useRef(0);
 
   // Calculate which item is currently visible
-  const updateActiveIndex = () => {
+  const updateActiveIndex = useCallback(() => {
       const container = scrollContainerRef.current;
     if (!container) return;
 
@@ -50,7 +50,7 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
 
     setActiveIndex(closestIndex);
     activeIndexRef.current = closestIndex;
-  };
+  }, [dishes]);
 
   const scrollToIndex = (index: number) => {
     const container = scrollContainerRef.current;
@@ -154,7 +154,7 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
       container.removeEventListener('scroll', handleScroll);
       clearTimeout(scrollTimeout);
     };
-  }, [dishes]);
+  }, [dishes, updateActiveIndex]);
 
   return (
     <section ref={sectionRef} className="relative h-screen flex items-center justify-center bg-card z-10" style={{ paddingTop: '80px' }}>
@@ -190,7 +190,7 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                       {/* Image - full width on mobile, half on desktop */}
                       <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
                       <Image
-                        src={dish.image}
+                        src={typeof dish.image === 'string' ? dish.image : dish.image.src}
                         alt={dish.name}
                         fill
                         className="object-cover"

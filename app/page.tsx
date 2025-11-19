@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { clearOrderRouteTracking } from "@/lib/route-tracker";
@@ -43,7 +43,7 @@ export default function Home() {
   // Location details (empty array since we only show address and map)
   const locationDetails: Array<{ icon: React.ReactNode; label: string; value: string }> = [];
 
-  const sections = ['hero', 'concept', 'menu', 'details', 'print-menu', 'order'];
+  const sections = useMemo(() => ['hero', 'concept', 'menu', 'details', 'print-menu', 'order'], []);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrollingRef = useRef(false);
 
@@ -105,11 +105,11 @@ export default function Home() {
         }
       })
     }
-  }, [])
+  }, [dishes])
 
   // Add structured data for SEO/GEO
   useEffect(() => {
-    const heroImagePath = resolveImagePath(config.hero.backgroundImage);
+    const heroImagePath = resolveImagePath(config.hero.backgroundImage || '');
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "Restaurant",

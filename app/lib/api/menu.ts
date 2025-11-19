@@ -169,7 +169,7 @@ export async function getMenuItemWithModifiers(id: string): Promise<MenuItemWith
   const modifierGroups = await getMenuItemModifierGroups(id)
 
   return {
-    ...item,
+    ...(item as MenuItem),
     modifier_groups: modifierGroups,
   }
 }

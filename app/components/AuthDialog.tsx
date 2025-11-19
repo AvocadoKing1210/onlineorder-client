@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-provider'
 import { login, logout } from '@/lib/auth'
 import {
@@ -18,9 +19,10 @@ import { User, LogOut } from 'lucide-react'
 interface AuthDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
-export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
   const { user, isLoading, isAuthenticated } = useAuth()
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [wasAuthenticatedOnOpen, setWasAuthenticatedOnOpen] = useState(false)
@@ -37,12 +39,13 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     if (isAuthenticated && user && open && !wasAuthenticatedOnOpen && isLoggingIn) {
       // User just completed login - show success briefly then close
       setIsLoggingIn(false)
+      onSuccess?.()
       const timer = setTimeout(() => {
         onOpenChange(false)
       }, 1500) // Give user time to see they're logged in
       return () => clearTimeout(timer)
     }
-  }, [isAuthenticated, user, open, wasAuthenticatedOnOpen, isLoggingIn, onOpenChange])
+  }, [isAuthenticated, user, open, wasAuthenticatedOnOpen, isLoggingIn, onOpenChange, onSuccess])
   
   // Reset logging state when dialog closes
   useEffect(() => {
@@ -105,11 +108,16 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
               <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg bg-muted/50">
                 <div className="flex-shrink-0">
                   {user.picture ? (
-                    <img
-                      src={user.picture}
-                      alt={user.name || 'User'}
-                      className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-2 border-card-border"
-                    />
+                    <div className="relative h-12 w-12 sm:h-16 sm:w-16 rounded-full border-2 border-card-border overflow-hidden">
+                      <Image
+                        src={user.picture}
+                        alt={user.name || 'User'}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                        unoptimized
+                      />
+                    </div>
                   ) : (
                     <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-card-border">
                       <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
@@ -180,7 +188,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
               <div className="text-center space-y-2">
                 <p className="text-xs text-muted-foreground">
-                  Don't have an account? Signing in will create one for you.
+                  Don&apos;t have an account? Signing in will create one for you.
                 </p>
                 <p className="text-xs text-muted-foreground">
                   You can continue browsing without signing in.

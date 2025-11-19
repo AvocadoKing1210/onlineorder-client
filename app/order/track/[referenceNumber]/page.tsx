@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/auth'
 import { getOrderByReference, type OrderDetails } from '@/lib/api/orders'
@@ -70,7 +70,7 @@ export default function OrderTrackingPage() {
   const isRealtimeConnectedRef = useRef(false)
 
   // Load order data
-  const loadOrder = async (showLoading = true) => {
+  const loadOrder = useCallback(async (showLoading = true) => {
     try {
       if (showLoading) {
         setIsLoading(true)
@@ -102,7 +102,7 @@ export default function OrderTrackingPage() {
         setIsLoading(false)
       }
     }
-  }
+  }, [referenceNumber, toast, router])
 
   // Set up Realtime subscription
   useEffect(() => {
@@ -279,7 +279,7 @@ export default function OrderTrackingPage() {
         cleanup()
       }
     }
-  }, [referenceNumber])
+  }, [referenceNumber, loadOrder, toast])
 
   // Calculate and update remaining time in real-time
   useEffect(() => {
@@ -314,7 +314,7 @@ export default function OrderTrackingPage() {
         countdownIntervalRef.current = null
       }
     }
-  }, [order?.estimated_preparation_minutes, order?.accepted_at, order?.status])
+  }, [order])
 
   // Auto-cleanup when order is finished
   useEffect(() => {
@@ -337,7 +337,7 @@ export default function OrderTrackingPage() {
 
       return () => clearTimeout(timer)
     }
-  }, [order?.status])
+  }, [order])
 
   if (isLoading) {
     return (

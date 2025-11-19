@@ -9,7 +9,7 @@ interface HeroSectionProps {
   tagline: string;
   dates: string;
   location: string;
-  backgroundImage?: string;
+  backgroundImage?: string | { src: string };
   backgroundVideo?: string;
   ctaText?: string;
 }
@@ -44,7 +44,7 @@ export default function HeroSection({
           {backgroundImage && (
             <div 
               className="absolute inset-0 bg-cover bg-center z-0"
-              style={{ backgroundImage: `url(${backgroundImage})` }}
+              style={{ backgroundImage: `url(${typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src})` }}
             />
           )}
           <video
@@ -70,7 +70,7 @@ export default function HeroSection({
       ) : backgroundImage ? (
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={{ backgroundImage: `url(${typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src})` }}
       >
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-20" />
       </div>

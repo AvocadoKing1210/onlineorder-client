@@ -514,11 +514,11 @@ export default function OrderPage() {
                           className="flex-shrink-0 w-28 sm:w-32"
                         >
                           <Card
-                            className="border-card-border hover:shadow-md transition-shadow overflow-hidden"
+                            className="border-card-border hover:shadow-md transition-shadow overflow-hidden flex flex-col"
                           >
-                            <CardContent className="p-0">
+                            <CardContent className="p-0 flex flex-col">
                               <div
-                                className="relative w-full aspect-square overflow-hidden cursor-pointer"
+                                className="relative w-full aspect-square overflow-hidden cursor-pointer flex-shrink-0"
                                 onClick={() => {
                                   setIsCartOpen(false)
                                   handleItemSelect(item)
@@ -543,11 +543,11 @@ export default function OrderPage() {
                                   )
                                 })()}
                               </div>
-                              <div className="p-2">
-                                <p className="text-xs font-medium text-foreground line-clamp-2 mb-1.5">
+                              <div className="p-2 flex flex-col flex-1 min-h-[60px]">
+                                <p className="text-xs font-medium text-foreground line-clamp-2 mb-1.5 min-h-[2.5rem]">
                                   {item.name}
                                 </p>
-                                <div className="flex items-center justify-between gap-1">
+                                <div className="flex items-center justify-between gap-1 mt-auto">
                                   <span className="text-xs font-geist text-foreground">
                                     ${parseFloat(item.price).toFixed(2)}
                                   </span>

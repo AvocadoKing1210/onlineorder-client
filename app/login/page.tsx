@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-provider'
 import { login, logout } from '@/lib/auth'
@@ -12,7 +13,7 @@ import { User, LogIn, LogOut, ArrowLeft } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { config } from '@/lib/config'
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, isLoading, isAuthenticated } = useAuth()
@@ -94,11 +95,16 @@ export default function LoginPage() {
                   <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
                     <div className="flex-shrink-0">
                       {user.picture ? (
-                        <img
-                          src={user.picture}
-                          alt={user.name || 'User'}
-                          className="h-16 w-16 rounded-full border-2 border-card-border"
-                        />
+                        <div className="relative h-16 w-16 rounded-full border-2 border-card-border overflow-hidden">
+                          <Image
+                            src={user.picture}
+                            alt={user.name || 'User'}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                            unoptimized
+                          />
+                        </div>
                       ) : (
                         <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-card-border">
                           <User className="h-8 w-8 text-primary" />
@@ -179,7 +185,7 @@ export default function LoginPage() {
 
                   <div className="text-center space-y-2">
                     <p className="text-xs text-muted-foreground">
-                      Don't have an account? Signing in will create one for you.
+                      Don&apos;t have an account? Signing in will create one for you.
                     </p>
                     <p className="text-xs text-muted-foreground">
                       You can continue browsing without signing in.
@@ -213,6 +219,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   )
 }
 

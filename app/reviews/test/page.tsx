@@ -199,7 +199,7 @@ export default function ReviewTestPage() {
                   {hasReviewed ? (
                     <>
                       <Star className="h-4 w-4 mr-2 fill-yellow-400 text-yellow-400" />
-                      You've already reviewed this item
+                      You&apos;ve already reviewed this item
                     </>
                   ) : (
                     'Write a Review'

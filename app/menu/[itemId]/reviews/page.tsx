@@ -45,7 +45,7 @@ export default function MenuItemReviewsPage({ params }: PageProps) {
       <div className="container mx-auto py-8 px-4 max-w-4xl">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">Menu Item Not Found</h1>
-          <p className="text-muted-foreground">The menu item you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground">The menu item you&apos;re looking for doesn&apos;t exist.</p>
           <Button onClick={() => router.push('/order')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Menu

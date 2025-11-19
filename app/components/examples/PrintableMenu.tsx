@@ -36,7 +36,7 @@ export default function PrintableMenuExample() {
     <PrintableMenu
       title="Take-Home Menu"
       subtitle="Save or print our curated selection for your records"
-      items={items}
+      categories={[{ name: "Featured", items }]}
     />
   );
 }

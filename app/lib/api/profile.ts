@@ -19,32 +19,46 @@ export interface UserProfile {
 
 /**
  * Get user profile for authenticated user via Next.js API route
+ * Returns null if user is not authenticated or profile doesn't exist
+ * Does not throw errors - gracefully handles missing/invalid tokens
  */
 export async function getUserProfile(): Promise<UserProfile | null> {
-  const authToken = await getAuth0Token()
-  if (!authToken) {
+  try {
+    const authToken = await getAuth0Token()
+    if (!authToken) {
+      return null
+    }
+
+    const url = getProfileApiUrl()
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
+      },
+    })
+
+    if (response.status === 404) {
+      return null
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      // Token is invalid or expired - return null instead of throwing
+      return null
+    }
+
+    if (!response.ok) {
+      // For other errors, log but don't throw - allow form to work without profile
+      console.warn('Failed to fetch user profile:', response.status)
+      return null
+    }
+
+    return response.json()
+  } catch (error) {
+    // Gracefully handle any errors - don't block the form
+    console.warn('Error fetching user profile:', error)
     return null
   }
-
-  const url = getProfileApiUrl()
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${authToken}`, // This will be forwarded by the Next.js API route to Cloudflare Worker
-    },
-  })
-
-  if (response.status === 404) {
-    return null
-  }
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: response.statusText }))
-    throw new Error(error.error || `Failed to fetch user profile: ${response.status}`)
-  }
-
-  return response.json()
 }
 
 /**
