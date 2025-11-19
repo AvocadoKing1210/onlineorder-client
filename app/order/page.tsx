@@ -475,7 +475,7 @@ export default function OrderPage() {
         const cartContent = (
           <>
           {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4 min-h-0">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4 min-h-0" style={{ minHeight: cart.length > 0 && cart.length < 3 ? '280px' : 'auto' }}>
             {cart.length === 0 ? (
               <Empty
                 icon={
@@ -692,8 +692,8 @@ export default function OrderPage() {
           <>
             {/* Mobile: Drawer */}
             <Drawer open={isCartOpen && isMobile} onOpenChange={setIsCartOpen}>
-              <DrawerContent className="max-h-[96vh] flex flex-col">
-                <DrawerHeader className="text-left">
+              <DrawerContent className="max-h-[96vh] flex flex-col min-h-[550px]">
+                <DrawerHeader className="text-left flex-shrink-0">
                   <DrawerTitle className="font-display text-xl sm:text-2xl">
                     Your Order
                   </DrawerTitle>

@@ -48,12 +48,29 @@ export function NotificationBanner() {
   const [localDismissed, setLocalDismissed] = useState<Set<string>>(new Set())
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isOnHeroSection, setIsOnHeroSection] = useState(true)
   const bannerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
   // Load dismissed notifications on mount
   useEffect(() => {
     setDismissedIds(getDismissedNotifications())
+  }, [])
+
+  // Check if we're on the hero section (first page)
+  useEffect(() => {
+    const checkScrollPosition = () => {
+      const heroSection = document.getElementById('hero')
+      if (heroSection) {
+        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight
+        const scrollPosition = window.scrollY + window.innerHeight / 2
+        setIsOnHeroSection(scrollPosition < heroBottom)
+      }
+    }
+
+    checkScrollPosition()
+    window.addEventListener('scroll', checkScrollPosition, { passive: true })
+    return () => window.removeEventListener('scroll', checkScrollPosition)
   }, [])
 
   // Fetch active notifications
@@ -92,6 +109,11 @@ export function NotificationBanner() {
   }
 
   if (isLoading || visibleNotifications.length === 0) {
+    return null
+  }
+
+  // Don't show notification on hero section (first page)
+  if (isOnHeroSection) {
     return null
   }
 
