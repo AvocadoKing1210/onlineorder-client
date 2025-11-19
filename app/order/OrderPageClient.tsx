@@ -126,26 +126,23 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
   const router = useRouter()
   const pathname = usePathname()
   const isMobile = useIsMobile()
-  const [cart, setCart] = useState<CartItem[]>([])
+  // Load cart synchronously during initial render to avoid delay
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      return loadCartFromStorage()
+    }
+    return []
+  })
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isCartLoaded, setIsCartLoaded] = useState(false)
+  const [isCartLoaded, setIsCartLoaded] = useState(true) // Already loaded synchronously
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCheckoutDialogOpen, setIsCheckoutDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const { toast } = useToast()
-
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = loadCartFromStorage()
-    if (savedCart.length > 0) {
-      setCart(savedCart)
-    }
-    setIsCartLoaded(true)
-  }, [])
 
   // Save cart to localStorage whenever cart changes
   useEffect(() => {
@@ -221,15 +218,15 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
     return grouped
   }, [filteredMenuItems])
 
-  // Calculate total price
-  const getTotalPrice = () => {
+  // Calculate total price - memoized to avoid recreating on every render
+  const getTotalPrice = useCallback(() => {
     return cart.reduce((total, item) => total + item.line_total, 0)
-  }
+  }, [cart])
 
-  // Get total items count
-  const getTotalItems = () => {
+  // Get total items count - memoized to avoid recreating on every render
+  const getTotalItems = useCallback(() => {
     return cart.reduce((total, item) => total + item.quantity, 0)
-  }
+  }, [cart])
 
   // Generate unique ID for cart item based on menu item and modifiers
   const generateCartItemId = (
@@ -322,15 +319,15 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
     setIsDialogOpen(true)
   }, [])
 
-  // Remove item from cart
-  const removeFromCart = (itemId: string) => {
+  // Remove item from cart - memoized for stable reference
+  const removeFromCart = useCallback((itemId: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== itemId))
-  }
+  }, [])
 
-  // Update item quantity
-  const updateQuantity = (itemId: string, quantity: number) => {
+  // Update item quantity - memoized for stable reference
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(itemId)
+      setCart((prevCart) => prevCart.filter((item) => item.id !== itemId))
       return
     }
     setCart((prevCart) =>
@@ -345,10 +342,10 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
         return item
       })
     )
-  }
+  }, [])
 
-  // Clear cart
-  const clearCart = () => {
+  // Clear cart - memoized for stable reference
+  const clearCart = useCallback(() => {
     setCart([])
     // Clear from localStorage as well
     if (typeof window !== 'undefined') {
@@ -358,7 +355,7 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
         console.error('Error clearing cart from localStorage:', error)
       }
     }
-  }
+  }, [])
 
   // Handle checkout button click - open checkout dialog - memoized with useCallback
   const handleCheckout = useCallback(() => {
@@ -469,21 +466,15 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
 
   const isLoading = categoriesLoading || itemsLoading
 
-  return (
-    <div className="min-h-screen bg-background">
-      <OrderNavbar 
-        onCartClick={() => setIsCartOpen(true)}
-        cartItemCount={getTotalItems()}
-      />
-      <NotificationBanner />
-      
-      {/* Cart Content Component */}
-      {(() => {
-        const cartContent = (
+  // Memoize cart content so it's always ready (no delay when drawer opens)
+  const cartContent = useMemo(() => {
+    const currentCart = cart
+    const currentMenuItems = menuItems
+    return (
           <>
           {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4 min-h-0" style={{ minHeight: cart.length > 0 && cart.length < 3 ? '280px' : 'auto' }}>
-            {cart.length === 0 ? (
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 space-y-3 sm:space-y-4 min-h-0" style={{ minHeight: currentCart.length > 0 && currentCart.length < 3 ? '280px' : 'auto' }}>
+            {currentCart.length === 0 ? (
               <Empty
                 icon={
                   <div className="rounded-md bg-muted p-3 border border-border">
@@ -509,13 +500,13 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
                 }
               >
                 {/* Recommendations */}
-                {menuItems.length > 0 && (
+                {currentMenuItems.length > 0 && (
                   <div className="px-4 sm:px-6">
                     <p className="text-xs sm:text-sm font-medium text-foreground mb-3">
                       Recommendations
                     </p>
                     <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 scrollbar-hide">
-                      {menuItems.slice(0, 5).map((item) => (
+                      {currentMenuItems.slice(0, 5).map((item) => (
                         <div
                           key={item.id}
                           className="flex-shrink-0 w-28 sm:w-32"
@@ -582,7 +573,7 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
               </Empty>
             ) : (
               <>
-                {cart.map((item) => (
+                {currentCart.map((item) => (
                     <Card key={item.id} className="border-card-border">
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex gap-3 sm:gap-4">
@@ -596,7 +587,8 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
                                   fill
                                   className="object-cover"
                                   sizes="80px"
-                                  loading="lazy"
+                                  loading="eager"
+                                  priority={true}
                                   unoptimized={imageUrl?.startsWith('http')}
                           />
                         </div>
@@ -665,7 +657,7 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
           </div>
 
           {/* Cart Footer */}
-          {cart.length > 0 && (
+          {currentCart.length > 0 && (
               <div className="border-t pt-4 px-4 sm:px-6 pb-4 sm:pb-6 space-y-3">
                 <div className="flex items-center justify-between text-base sm:text-lg">
                 <span className="text-muted-foreground font-medium">Total</span>
@@ -678,7 +670,7 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
                    className="w-full no-default-hover-elevate no-default-active-elevate bg-foreground text-background hover:bg-foreground/90 border-transparent"
                   size="lg"
                   onClick={handleCheckout}
-                  disabled={isSubmitting || cart.length === 0}
+                  disabled={isSubmitting || currentCart.length === 0}
                 >
                   {isSubmitting ? 'Submitting...' : 'Proceed to Checkout'}
                 </Button>
@@ -693,48 +685,55 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
               </div>
             )}
           </>
-        )
+    )
+  }, [cart, menuItems, isSubmitting, handleItemSelect, handleCheckout, getTotalItems, getTotalPrice, removeFromCart, updateQuantity, clearCart])
 
-        return (
-          <>
-            {/* Mobile: Drawer */}
-            <Drawer open={isCartOpen && isMobile} onOpenChange={setIsCartOpen}>
-              <DrawerContent className="max-h-[96vh] flex flex-col min-h-[550px]">
-                <DrawerHeader className="text-left flex-shrink-0">
-                  <DrawerTitle className="font-display text-xl sm:text-2xl">
-                    Your Order
-                  </DrawerTitle>
-                  <DrawerDescription>
-                    {cart.length === 0 
-                      ? 'Your cart is empty' 
-                      : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
-                  </DrawerDescription>
-                </DrawerHeader>
-                {cartContent}
-        </DrawerContent>
-      </Drawer>
+  return (
+    <div className="min-h-screen bg-background">
+      <OrderNavbar 
+        onCartClick={() => setIsCartOpen(true)}
+        cartItemCount={getTotalItems()}
+      />
+      <NotificationBanner />
+      
+      {/* Cart Drawer/Sheet - Always rendered for instant opening */}
+      <>
+        {/* Mobile: Drawer */}
+        <Drawer open={isCartOpen && isMobile} onOpenChange={setIsCartOpen}>
+          <DrawerContent className="max-h-[96vh] flex flex-col min-h-[550px]">
+            <DrawerHeader className="text-left flex-shrink-0">
+              <DrawerTitle className="font-display text-xl sm:text-2xl">
+                Your Order
+              </DrawerTitle>
+              <DrawerDescription>
+                {cart.length === 0 
+                  ? 'Your cart is empty' 
+                  : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
+              </DrawerDescription>
+            </DrawerHeader>
+            {cartContent}
+          </DrawerContent>
+        </Drawer>
 
-            {/* Desktop: Sheet */}
-            <Sheet open={isCartOpen && !isMobile} onOpenChange={setIsCartOpen}>
-              <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0">
-                <SheetHeader className="px-6 pt-6 pb-4">
-                  <SheetTitle className="font-display text-xl sm:text-2xl">
-                    Your Order
-                  </SheetTitle>
-                  <SheetDescription>
-                    {cart.length === 0 
-                      ? 'Your cart is empty' 
-                      : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-                  {cartContent}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </>
-        )
-      })()}
+        {/* Desktop: Sheet */}
+        <Sheet open={isCartOpen && !isMobile} onOpenChange={setIsCartOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0">
+            <SheetHeader className="px-6 pt-6 pb-4">
+              <SheetTitle className="font-display text-xl sm:text-2xl">
+                Your Order
+              </SheetTitle>
+              <SheetDescription>
+                {cart.length === 0 
+                  ? 'Your cart is empty' 
+                  : `${getTotalItems()} ${getTotalItems() === 1 ? 'item' : 'items'} in your cart`}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              {cartContent}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </>
 
       {/* Main Content */}
       <div 
