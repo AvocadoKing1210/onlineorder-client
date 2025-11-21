@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Download } from "lucide-react";
+import { Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 interface MenuItem {
   name: string;
@@ -25,6 +26,8 @@ interface PrintableMenuProps {
 
 export default function PrintableMenu({ title, subtitle, categories }: PrintableMenuProps) {
   const [activeTab, setActiveTab] = useState(categories[0]?.name || "");
+  const [showNavigation, setShowNavigation] = useState<Record<string, boolean>>({});
+  const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const handleDownload = () => {
     // Create a link element to trigger download
@@ -34,6 +37,48 @@ export default function PrintableMenu({ title, subtitle, categories }: Printable
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Check if content overflows for each category
+  useEffect(() => {
+    const checkOverflow = () => {
+      const newShowNavigation: Record<string, boolean> = {};
+      categories.forEach((category) => {
+        const container = scrollRefs.current[category.name];
+        if (container) {
+          const hasOverflow = container.scrollWidth > container.clientWidth;
+          newShowNavigation[category.name] = hasOverflow;
+        }
+      });
+      setShowNavigation(newShowNavigation);
+    };
+
+    // Check immediately
+    checkOverflow();
+    
+    // Check after a short delay to account for content loading
+    const timeoutId = setTimeout(checkOverflow, 100);
+    
+    window.addEventListener('resize', checkOverflow);
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+      clearTimeout(timeoutId);
+    };
+  }, [categories, activeTab]);
+
+  const scrollTo = (categoryName: string, direction: 'prev' | 'next') => {
+    const container = scrollRefs.current[categoryName];
+    if (!container) return;
+
+    const scrollAmount = container.clientWidth * 0.8;
+    const scrollPosition = direction === 'next' 
+      ? container.scrollLeft + scrollAmount
+      : container.scrollLeft - scrollAmount;
+    
+    container.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -84,37 +129,69 @@ export default function PrintableMenu({ title, subtitle, categories }: Printable
           
           {categories.map((category) => (
             <TabsContent key={category.name} value={category.name} className="mt-0">
-              <div className="overflow-x-auto pb-4 -mx-2 sm:-mx-3 md:-mx-2 px-2 sm:px-3 md:px-2 scrollbar-hide">
-                <div className="flex gap-3 sm:gap-4 md:gap-6 min-w-max">
-                  {category.items.map((item, index) => (
-            <div 
-              key={index}
-                      className="flex flex-col w-64 sm:w-72 md:w-80 h-[320px] sm:h-[360px] md:h-96 flex-shrink-0 gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-6 border border-border rounded-lg hover-elevate bg-card transition-all"
-                      data-testid={`menu-item-${category.name}-${index}`}
-            >
-                      <div className="w-full h-28 sm:h-36 md:h-48 flex-shrink-0 rounded-md overflow-hidden bg-muted relative">
-                        <Image
-                  src={typeof item.image === 'string' ? item.image : item.image.src}
-                  alt={item.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 256px, (max-width: 768px) 288px, 320px"
-                          quality={85}
-                          priority={index < 4}
-                />
-              </div>
-                      <div className="flex flex-col flex-1 min-h-0">
-                <div className="flex justify-between items-start mb-1 sm:mb-2 gap-1 sm:gap-2">
-                          <h3 className="font-display text-base sm:text-lg md:text-xl text-foreground line-clamp-2">{item.name}</h3>
-                          <span className="font-serif text-foreground whitespace-nowrap text-sm sm:text-base md:text-lg flex-shrink-0">{item.price}</span>
+              <div className="flex items-center gap-2 md:gap-4">
+                {/* Previous button */}
+                {showNavigation[category.name] && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => scrollTo(category.name, 'prev')}
+                    className="flex-shrink-0 rounded-full h-10 w-10 md:h-12 md:w-12 bg-background/80 hover:bg-background/90 shadow-lg border border-border"
+                    aria-label="Previous items"
+                  >
+                    <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+                  </Button>
+                )}
+
+                {/* Scrollable container */}
+                <div 
+                  ref={(el) => { scrollRefs.current[category.name] = el; }}
+                  className="flex-1 overflow-x-auto pb-4 -mx-2 sm:-mx-3 md:-mx-2 px-2 sm:px-3 md:px-2 scrollbar-hide scroll-smooth"
+                >
+                  <div className="flex gap-3 sm:gap-4 md:gap-6 min-w-max">
+                    {category.items.map((item, index) => (
+              <div 
+                key={index}
+                        className="flex flex-col w-64 sm:w-72 md:w-80 h-[320px] sm:h-[360px] md:h-96 flex-shrink-0 gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-6 border border-border rounded-lg hover-elevate bg-card transition-all"
+                        data-testid={`menu-item-${category.name}-${index}`}
+              >
+                        <div className="w-full h-28 sm:h-36 md:h-48 flex-shrink-0 rounded-md overflow-hidden bg-muted relative">
+                          <Image
+                    src={typeof item.image === 'string' ? item.image : item.image.src}
+                    alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 256px, (max-width: 768px) 288px, 320px"
+                            quality={85}
+                            priority={index < 4}
+                  />
                 </div>
-                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {item.description}
-                </p>
+                        <div className="flex flex-col flex-1 min-h-0">
+                  <div className="flex justify-between items-start mb-1 sm:mb-2 gap-1 sm:gap-2">
+                            <h3 className="font-display text-base sm:text-lg md:text-xl text-foreground line-clamp-2">{item.name}</h3>
+                            <span className="font-serif text-foreground whitespace-nowrap text-sm sm:text-base md:text-lg flex-shrink-0">{item.price}</span>
+                  </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    {item.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+                </div>
+
+                {/* Next button */}
+                {showNavigation[category.name] && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => scrollTo(category.name, 'next')}
+                    className="flex-shrink-0 rounded-full h-10 w-10 md:h-12 md:w-12 bg-background/80 hover:bg-background/90 shadow-lg border border-border"
+                    aria-label="Next items"
+                  >
+                    <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                  </Button>
+                )}
               </div>
             </TabsContent>
           ))}

@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Dish {
   name: string;
@@ -67,6 +69,16 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
         isUserScrollingRef.current = false;
       }, 1000);
     }
+  };
+
+  const handlePrevious = () => {
+    const prevIndex = activeIndex > 0 ? activeIndex - 1 : dishes.length - 1;
+    scrollToIndex(prevIndex);
+  };
+
+  const handleNext = () => {
+    const nextIndex = (activeIndex + 1) % dishes.length;
+    scrollToIndex(nextIndex);
   };
 
   // Check if section is visible in viewport
@@ -183,12 +195,12 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                   <div
                     key={index}
                     data-dish-index={index}
-                    className="flex-shrink-0 w-[90vw] md:w-[800px] h-full flex items-center md:items-center"
+                    className="flex-shrink-0 w-[90vw] md:w-[800px] flex items-center md:items-center"
                     style={{ scrollSnapAlign: 'center' }}
                   >
                     <Card className="overflow-hidden hover-elevate transition-transform duration-300 w-full h-auto md:h-[70vh] flex flex-col md:flex-row">
                       {/* Image - full width on mobile, half on desktop */}
-                      <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
+                      <div className="w-full md:w-1/2 h-[40vh] min-h-[250px] md:h-full overflow-hidden relative">
                       <Image
                         src={typeof dish.image === 'string' ? dish.image : dish.image.src}
                         alt={dish.name}
@@ -228,8 +240,20 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
               </div>
             </div>
 
-            {/* Scroll indicator dots below the scrollable area */}
-            <div className="flex justify-center items-center py-4 mt-2">
+            {/* Navigation buttons and scroll indicator dots */}
+            <div className="flex justify-center items-center py-4 mt-2 gap-4">
+              {/* Previous button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePrevious}
+                className="rounded-full h-10 w-10 bg-foreground/5 hover:bg-foreground/10"
+                aria-label="Previous dish"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+
+              {/* Dots indicator */}
               <div className="bg-foreground/10 dark:bg-foreground/20 rounded-full px-4 py-2 flex items-center gap-2">
                 {dishes.map((_, index) => (
                   <button
@@ -245,6 +269,17 @@ export default function MenuHighlights({ title, dishes }: MenuHighlightsProps) {
                   />
                 ))}
               </div>
+
+              {/* Next button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleNext}
+                className="rounded-full h-10 w-10 bg-foreground/5 hover:bg-foreground/10"
+                aria-label="Next dish"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         </div>

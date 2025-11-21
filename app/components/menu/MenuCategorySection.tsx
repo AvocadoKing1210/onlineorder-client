@@ -9,7 +9,6 @@ interface MenuCategorySectionProps {
   items: MenuItemWithCategory[]
   onItemSelect: (item: MenuItemWithCategory) => void
   priority?: boolean
-  forceEager?: boolean
 }
 
 export function MenuCategorySection({
@@ -17,7 +16,6 @@ export function MenuCategorySection({
   items,
   onItemSelect,
   priority = false,
-  forceEager = false,
 }: MenuCategorySectionProps) {
   if (items.length === 0) {
     return null
@@ -39,7 +37,6 @@ export function MenuCategorySection({
               item={item}
               onSelect={onItemSelect}
               priority={priority && index < 6}
-              forceEager={forceEager}
             />
         ))}
       </div>

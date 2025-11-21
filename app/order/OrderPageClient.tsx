@@ -686,7 +686,7 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
             )}
           </>
     )
-  }, [cart, menuItems, isSubmitting, handleItemSelect, handleCheckout, getTotalItems, getTotalPrice, removeFromCart, updateQuantity, clearCart])
+  }, [cart, menuItems, isSubmitting, handleItemSelect, handleCheckout, getTotalPrice, removeFromCart, updateQuantity, clearCart])
 
   return (
     <div className="min-h-screen bg-background">

@@ -50,6 +50,7 @@ export function NotificationBanner() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isOnHeroSection, setIsOnHeroSection] = useState(true)
   const bannerRef = useRef<HTMLDivElement>(null)
+  const scrollPositionRef = useRef<number>(0)
   const isMobile = useIsMobile()
 
   // Load dismissed notifications on mount
@@ -59,12 +60,19 @@ export function NotificationBanner() {
 
   // Check if we're on the hero section (first page)
   useEffect(() => {
+    let ticking = false
     const checkScrollPosition = () => {
-      const heroSection = document.getElementById('hero')
-      if (heroSection) {
-        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight
-        const scrollPosition = window.scrollY + window.innerHeight / 2
-        setIsOnHeroSection(scrollPosition < heroBottom)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const heroSection = document.getElementById('hero')
+          if (heroSection) {
+            const heroBottom = heroSection.offsetTop + heroSection.offsetHeight
+            const scrollPosition = window.scrollY + window.innerHeight / 2
+            setIsOnHeroSection(scrollPosition < heroBottom)
+          }
+          ticking = false
+        })
+        ticking = true
       }
     }
 
@@ -96,10 +104,27 @@ export function NotificationBanner() {
     }
   }, [visibleNotifications.length])
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: Notification, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    // Save current scroll position before opening dialog
+    scrollPositionRef.current = window.scrollY
     setSelectedNotification(notification)
     setIsDialogOpen(true)
   }
+
+  // Restore scroll position when dialog closes
+  useEffect(() => {
+    if (!isDialogOpen && scrollPositionRef.current > 0) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: scrollPositionRef.current,
+          behavior: 'instant' as ScrollBehavior
+        })
+      })
+    }
+  }, [isDialogOpen])
 
   const handleDismiss = (id: string, e: React.MouseEvent) => {
     e.stopPropagation() // Prevent opening dialog when clicking dismiss
@@ -112,38 +137,37 @@ export function NotificationBanner() {
     return null
   }
 
-  // Don't show notification on hero section (first page)
-  if (isOnHeroSection) {
-    return null
-  }
+  const shouldShowBanner = !isOnHeroSection && !isDialogOpen
 
   return (
     <>
-      <div 
-        ref={bannerRef}
-        className="fixed top-16 sm:top-20 left-0 right-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm"
-      >
-        <div className="w-full px-4 sm:px-6 py-4 sm:py-5">
-          <div className="flex items-center gap-2 sm:gap-3 w-full">
-            {visibleNotifications.map((notification) => (
-              <NotificationBannerItem
-                key={notification.id}
-                notification={notification}
-                onClick={() => handleNotificationClick(notification)}
-                onDismiss={(e) => handleDismiss(notification.id, e)}
-              />
-            ))}
+      {shouldShowBanner && (
+        <div 
+          ref={bannerRef}
+          className="fixed top-16 sm:top-20 left-0 right-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm"
+        >
+          <div className="w-full px-4 sm:px-6 py-4 sm:py-5">
+            <div className="flex flex-col gap-2 sm:gap-3 w-full">
+              {visibleNotifications.map((notification) => (
+                <NotificationBannerItem
+                  key={notification.id}
+                  notification={notification}
+                  onClick={(e) => handleNotificationClick(notification, e)}
+                  onDismiss={(e) => handleDismiss(notification.id, e)}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Notification Detail Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className={`${isMobile ? 'w-screen h-screen max-w-none max-h-none m-0 rounded-none' : 'max-w-2xl max-h-[90vh]'} flex flex-col p-0 gap-0 [&>button]:hidden`}>
-          <DialogHeader className="px-8 pt-16 pb-4 relative">
+          <DialogHeader className={`px-8 ${isMobile ? 'pt-24' : 'pt-16'} pb-4 relative`}>
             <button
               onClick={() => setIsDialogOpen(false)}
-              className="absolute right-8 top-8 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+              className={`absolute right-8 ${isMobile ? 'top-12' : 'top-8'} rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none`}
               aria-label="Close"
             >
               <X className="h-7 w-7" />
@@ -172,7 +196,7 @@ export function NotificationBanner() {
                 prose-li:text-foreground prose-li:my-1
                 prose-blockquote:text-muted-foreground prose-blockquote:border-l-foreground/20 prose-blockquote:my-4 prose-blockquote:pl-4
                 prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:my-4 prose-img:shadow-sm
+                prose-img:rounded-lg prose-img:max-w-full md:prose-img:max-w-md lg:prose-img:max-w-lg prose-img:h-auto prose-img:my-4 prose-img:mx-auto prose-img:block prose-img:shadow-sm
                 prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80
                 prose-hr:my-4 prose-hr:border-border"
               dangerouslySetInnerHTML={{ __html: selectedNotification?.body || '' }}
@@ -186,19 +210,19 @@ export function NotificationBanner() {
 
 interface NotificationBannerItemProps {
   notification: Notification
-  onClick: () => void
+  onClick: (e: React.MouseEvent) => void
   onDismiss: (e: React.MouseEvent) => void
 }
 
 function NotificationBannerItem({ notification, onClick, onDismiss }: NotificationBannerItemProps) {
   return (
     <div 
-      className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0"
+      className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 cursor-pointer hover:bg-muted/50 rounded-md px-2 py-1 transition-colors"
+      onClick={onClick}
     >
       <Info className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/70 flex-shrink-0" />
       <span 
-        className="text-sm sm:text-base text-foreground truncate flex-1 cursor-pointer hover:underline"
-        onClick={onClick}
+        className="text-sm sm:text-base text-foreground truncate flex-1 hover:underline"
       >
         {notification.title}
       </span>

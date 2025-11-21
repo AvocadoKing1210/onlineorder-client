@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     // Image sizes for srcset (these match our menu card sizes)
     imageSizes: [16, 32, 48, 64, 96, 128, 144, 256, 384],
+    // Image quality values (required for Next.js 16+)
+    qualities: [75, 80, 85, 90, 95, 100],
     // Disable static image imports optimization (we use remote images)
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
