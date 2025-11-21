@@ -56,6 +56,7 @@ import { CheckoutDialog } from '@/components/checkout/CheckoutDialog'
 import type { CheckoutFormData } from '@/components/checkout/CheckoutForm'
 import { saveProfileFromCheckout } from '@/lib/api/profile'
 import { NotificationBanner } from '@/components/NotificationBanner'
+import { MenuImagePreloader } from '@/components/menu/MenuImagePreloader'
 
 // Cart Types with Modifiers Support
 interface CartItemModifier {
@@ -531,8 +532,8 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
                                       fill
                                       className="object-cover hover:scale-105 transition-transform duration-300"
                                       sizes="(max-width: 640px) 112px, 128px"
-                                      loading="lazy"
-                                      unoptimized={imageUrl?.startsWith('http')}
+                                      quality={85}
+                                      priority={true}
                                     />
                                   ) : (
                                   <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -587,9 +588,8 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
                                   fill
                                   className="object-cover"
                                   sizes="80px"
-                                  loading="eager"
+                                  quality={85}
                                   priority={true}
-                                  unoptimized={imageUrl?.startsWith('http')}
                           />
                         </div>
                             ) : null
@@ -690,6 +690,9 @@ export default function OrderPageClient({ initialCategories, initialMenuItems }:
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Preload all menu images aggressively */}
+      <MenuImagePreloader items={menuItems} />
+      
       <OrderNavbar 
         onCartClick={() => setIsCartOpen(true)}
         cartItemCount={getTotalItems()}

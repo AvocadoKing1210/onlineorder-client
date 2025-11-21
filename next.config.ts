@@ -6,11 +6,25 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'bucket.zeelu.me',
+      },
+      {
+        protocol: 'https',
         hostname: '**',
       },
     ],
-    // Enable caching for images
+    // Enable aggressive caching for images
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+    // Optimize image formats (WebP is ~30% smaller, AVIF is ~50% smaller than JPEG)
+    formats: ['image/avif', 'image/webp'],
+    // Device sizes for responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Image sizes for srcset (these match our menu card sizes)
+    imageSizes: [16, 32, 48, 64, 96, 128, 144, 256, 384],
+    // Disable static image imports optimization (we use remote images)
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Add cache headers for static assets
   async headers() {

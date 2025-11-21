@@ -66,17 +66,15 @@ function MenuItemCardComponent({ item, onSelect, priority = false }: MenuItemCar
         <div className="flex flex-row gap-0">
           {/* Image */}
           {hasImage ? (
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0 overflow-hidden">
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0 overflow-hidden bg-muted">
               <Image
                 src={imageUrl!}
                 alt={item.name}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 112px, 144px"
-                loading={priority ? "eager" : "lazy"}
-                unoptimized={imageUrl?.startsWith('http')}
-                priority={priority}
-                fetchPriority={priority ? "high" : "auto"}
+                quality={85}
+                priority={true}
               />
               {primaryTag && (
                 <Badge 

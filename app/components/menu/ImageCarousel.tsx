@@ -35,7 +35,7 @@ export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
           fill
           className="object-contain sm:object-cover"
           sizes="(max-width: 640px) 100vw, 288px"
-          unoptimized={validImages[0]?.startsWith('http')}
+          quality={85}
         />
       </div>
     )
@@ -90,7 +90,7 @@ export function ImageCarousel({ images, alt, className }: ImageCarouselProps) {
         fill
         className="object-contain sm:object-cover transition-opacity duration-300"
         sizes="(max-width: 640px) 100vw, 288px"
-        unoptimized={validImages[currentIndex]?.startsWith('http')}
+        quality={85}
       />
 
       {/* Navigation Buttons */}
